@@ -1,0 +1,21 @@
+# Mock endpoint for testing
+mock:
+  url: http://localhost:8081/mock
+  method: POST
+  body: '{"message": "Hello, World!"}'
+  headers:
+    Content-Type: application/json
+    Test-Header: test1
+
+# Public test site
+example:
+  url: http://example.com
+  method: GET
+  body: ""
+  headers:
+    Content-Type: text/plain
+
+# Metrics endpoint
+metrics:
+  url: https://localhost:4000/metrics
+  method: GET
