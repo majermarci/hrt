@@ -6,24 +6,22 @@ import (
 	"fmt"
 	"net/http"
 	"os"
-
-	"gopkg.in/yaml.v2"
 )
-
-type Endpoint struct {
-	URL     string            `yaml:"url"`
-	Method  string            `yaml:"method"`
-	Body    string            `yaml:"body"`
-	Headers map[string]string `yaml:"headers"`
-}
 
 func main() {
 	// Define the command-line options
-	configFile := flag.String("c", "hrt.yaml", "Specify a config file")
-	runAll := flag.Bool("a", false, "Run all tests from config file")
 	requestName := flag.String("r", "", "Request to run from config file")
+	configFile := flag.String("c", "hrt.yaml", "Specify a config file")
 	insecure := flag.Bool("k", false, "Disable certificate validation")
+	runAll := flag.Bool("a", false, "Run all tests from config file")
 	flag.Parse()
+
+	// Load the config file
+	conf, err := loadConfig(*configFile)
+	if err != nil {
+		fmt.Printf("Failed to load config - %v\n", err)
+		os.Exit(1)
+	}
 
 	// Create an HTTP client
 	var client *http.Client
@@ -37,21 +35,6 @@ func main() {
 		client = &http.Client{}
 	}
 
-	// Read the YAML file
-	data, err := os.ReadFile(*configFile)
-	if err != nil {
-		fmt.Printf("Failed to load default config - %v\n", err)
-		os.Exit(1)
-	}
-
-	// Unmarshal the YAML data into a map of Endpoint structs
-	var config map[string]Endpoint
-	err = yaml.Unmarshal(data, &config)
-	if err != nil {
-		fmt.Printf("Failed to unmarshal config - %v\n", err)
-		os.Exit(1)
-	}
-
 	// If the -a option is enabled, run all tests
 	if *runAll {
 		if *requestName != "" {
@@ -59,7 +42,7 @@ func main() {
 			os.Exit(1)
 		}
 
-		for requestName, endpoint := range config {
+		for requestName, endpoint := range conf {
 			runTest(requestName, endpoint, client)
 		}
 	} else {
@@ -69,7 +52,7 @@ func main() {
 		}
 
 		// Find the endpoint for the specified request
-		endpoint, ok := config[*requestName]
+		endpoint, ok := conf[*requestName]
 		if !ok {
 			fmt.Printf("No endpoint found for request '%s'\n", *requestName)
 			os.Exit(1)
