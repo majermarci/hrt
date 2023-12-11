@@ -8,6 +8,8 @@ This app works with a simple and easy-to-back-up yaml configuration, which can b
 ## To-Do / Plans
 
 - Make response outputs nicer and more readable
+- Hide response body if none is given back
+- Add option to list / hide response headers
 - Create listing for all available requests with no option given
 - Create show details option for specific request
 - Add Basic, OAuth2 and other token auth options

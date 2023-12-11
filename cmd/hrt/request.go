@@ -29,12 +29,13 @@ func runTest(test string, ep Endpoint, client *http.Client) {
 	}
 	defer resp.Body.Close()
 
+	// Read the response body
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		fmt.Printf("Failed to read response body for endpoint %s: %v", test, err)
 		os.Exit(1)
 	}
 
-	fmt.Printf("Response for endpoint %s: %v\n", test, resp.Status)
-	fmt.Printf("Body: %s\n", body)
+	fmt.Printf("Status Code for '%s': %v\n", test, resp.Status)
+	fmt.Printf("Response Body: \n%s\n", body)
 }

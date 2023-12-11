@@ -9,9 +9,8 @@ mock:
 
 # Public test site
 example:
-  url: http://example.com
+  url: https://example.com
   method: GET
-  body: ""
   headers:
     Content-Type: text/plain
 
