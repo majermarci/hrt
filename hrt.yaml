@@ -1,3 +1,10 @@
+# Public test site
+example:
+  url: https://example.com
+  method: GET
+  headers:
+    Content-Type: text/plain
+
 # Mock endpoint for testing
 mock:
   url: http://localhost:8081/mock
@@ -7,14 +14,45 @@ mock:
     Content-Type: application/json
     Test-Header: test1
 
-# Public test site
-example:
-  url: https://example.com
+json:
+  url: https://localhost:4000/echo/json
   method: GET
-  headers:
-    Content-Type: text/plain
+  body: '{"message": "Hello, World!"}'
 
-# Metrics endpoint
-metrics:
-  url: https://localhost:4000/metrics
-  method: GET
+xml:
+  url: https://localhost:4000/echo/xml
+  method: POST
+  body:
+    <?xml version="1.0" encoding="UTF-8"?>
+    <soap:Envelope
+      xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+      <soap:Body>
+        <ns4:produceServiceOrder
+          xmlns:ns4="http://services.net/IOSS"
+          xmlns:ns1="http://schemasnet/csdg"
+          xmlns:ns2="http://services.net/types">
+          <ns2:context>
+            <ns1:technicalContext>
+              <ns1:from>vendor</ns1:from>
+              <ns1:replyState>active</ns1:replyState>
+            </ns1:technicalContext>
+            <ns1:businessContext>
+              <ns1:processId>5</ns1:processId>
+              <ns1:processTypeId>manager-id</ns1:processTypeId>
+            </ns1:businessContext>
+          </ns2:context>
+        </ns4:produceServiceOrder>
+      </soap:Body>
+    </soap:Envelope>
+  headers:
+    Content-Type: application/xml
+
+yaml:
+  url: https://localhost:4000/echo/xml
+  method: POST
+  body: |
+    Test: name
+    Test2: name2
+      Valami: test3
+  headers:
+    Content-Type: application/xml

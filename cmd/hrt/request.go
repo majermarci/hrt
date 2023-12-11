@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
@@ -8,7 +9,7 @@ import (
 	"strings"
 )
 
-func runTest(test string, ep Endpoint, client *http.Client) {
+func runTest(test string, ep Endpoint, client *http.Client) Response {
 	// Perform an HTTP request for the endpoint
 	req, err := http.NewRequest(ep.Method, ep.URL, strings.NewReader(ep.Body))
 	if err != nil {
@@ -36,6 +37,27 @@ func runTest(test string, ep Endpoint, client *http.Client) {
 		os.Exit(1)
 	}
 
-	fmt.Printf("Status Code for '%s': %v\n", test, resp.Status)
-	fmt.Printf("Response Body: \n%s\n", body)
+	// Try to unmarshal the body into a JSON object
+	var jsonObj map[string]interface{}
+	if err := json.Unmarshal(body, &jsonObj); err == nil {
+		// If successful, re-marshal it with indentation
+		body, _ = json.MarshalIndent(jsonObj, "", "  ")
+	}
+
+	// // Try to unmarshal the body into an XML object
+	// var xmlObj map[string]interface{}
+	// if err := xml.Unmarshal(body, &xmlObj); err == nil {
+	// 	// If successful, re-marshal it with indentation
+	// 	body, _ = xml.MarshalIndent(xmlObj, "", "  ")
+	// }
+
+	// fmt.Printf("Status Code for '%s': %v\n", test, resp.Status)
+	// fmt.Printf("Response Body: \n%s\n", body)
+
+	// Return the response
+	return Response{
+		Test:         test,
+		StatusCode:   resp.Status,
+		ResponseBody: string(body),
+	}
 }
