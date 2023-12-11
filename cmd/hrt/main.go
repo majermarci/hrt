@@ -8,18 +8,27 @@ import (
 	"os"
 )
 
+var (
+	confFile     = flag.String("c", "hrt.yaml", "Specify a config file")
+	requestName  = flag.String("r", "", "Request to run from config file")
+	runAll       = flag.Bool("a", false, "Run all tests from config file")
+	insecure     = flag.Bool("k", false, "Disable certificate validation")
+	allResponses []Response
+)
+
+type Response struct {
+	Test         string
+	StatusCode   string
+	ResponseBody string
+}
+
 func main() {
-	// Define the command-line options
-	requestName := flag.String("r", "", "Request to run from config file")
-	configFile := flag.String("c", "hrt.yaml", "Specify a config file")
-	insecure := flag.Bool("k", false, "Disable certificate validation")
-	runAll := flag.Bool("a", false, "Run all tests from config file")
 	flag.Parse()
 
-	// Load the config file
-	conf, err := loadConfig(*configFile)
+	// Load the configuration file
+	conf, err := loadConfig(*confFile)
 	if err != nil {
-		fmt.Printf("Failed to load config - %v\n", err)
+		fmt.Printf("Failed to load configuration file: %v\n", err)
 		os.Exit(1)
 	}
 
@@ -43,8 +52,10 @@ func main() {
 		}
 
 		for requestName, endpoint := range conf {
-			runTest(requestName, endpoint, client)
+			response := runTest(requestName, endpoint, client)
+			allResponses = append(allResponses, response)
 		}
+		printTable(allResponses)
 	} else {
 		if *requestName == "" {
 			fmt.Println("Please specify a request to run using the '-r' flag")
@@ -58,7 +69,9 @@ func main() {
 			os.Exit(1)
 		}
 
-		runTest(*requestName, endpoint, client)
+		response := runTest(*requestName, endpoint, client)
+		allResponses = append(allResponses, response)
+		printTable(allResponses)
 	}
 
 	// If no flags are specified, print out the available flags
