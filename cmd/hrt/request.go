@@ -44,13 +44,6 @@ func runTest(test string, ep Endpoint, client *http.Client) Response {
 		body, _ = json.MarshalIndent(jsonObj, "", "  ")
 	}
 
-	// // Try to unmarshal the body into an XML object
-	// var xmlObj map[string]interface{}
-	// if err := xml.Unmarshal(body, &xmlObj); err == nil {
-	// 	// If successful, re-marshal it with indentation
-	// 	body, _ = xml.MarshalIndent(xmlObj, "", "  ")
-	// }
-
 	// fmt.Printf("Status Code for '%s': %v\n", test, resp.Status)
 	// fmt.Printf("Response Body: \n%s\n", body)
 
