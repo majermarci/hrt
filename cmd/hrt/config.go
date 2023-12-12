@@ -14,7 +14,7 @@ type Endpoint struct {
 }
 
 func loadConfig(file string) (map[string]Endpoint, error) {
-	data, err := os.ReadFile(*&file)
+	data, err := os.ReadFile(file)
 	if err != nil {
 		return nil, err
 	}
