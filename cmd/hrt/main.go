@@ -13,6 +13,7 @@ var (
 	requestName  = flag.String("r", "", "Request to run from config file")
 	runAll       = flag.Bool("a", false, "Run all tests from config file")
 	insecure     = flag.Bool("k", false, "Disable certificate validation")
+	tableOutput  = flag.Bool("t", false, "Enable table output")
 	allResponses []Response
 )
 
@@ -55,7 +56,13 @@ func main() {
 			response := runTest(requestName, endpoint, client)
 			allResponses = append(allResponses, response)
 		}
-		printTable(allResponses)
+		if *tableOutput {
+			printTable(allResponses)
+		} else {
+			for _, response := range allResponses {
+				fmt.Printf("Request: %s\nStatus: %v\nBody: \n%s\n", response.Test, response.StatusCode, response.ResponseBody)
+			}
+		}
 	} else {
 		if *requestName == "" {
 			fmt.Println("Please specify a request to run using the '-r' flag")
@@ -71,7 +78,13 @@ func main() {
 
 		response := runTest(*requestName, endpoint, client)
 		allResponses = append(allResponses, response)
-		printTable(allResponses)
+		if *tableOutput {
+			printTable(allResponses)
+		} else {
+			for _, response := range allResponses {
+				fmt.Printf("Request: %s\nStatus: %v\nBody: \n%s\n", response.Test, response.StatusCode, response.ResponseBody)
+			}
+		}
 	}
 
 	// If no flags are specified, print out the available flags
