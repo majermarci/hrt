@@ -1,7 +1,6 @@
 # Public test site
 example:
   url: https://example.com
-  method: GET
   headers:
     Content-Type: text/plain
 

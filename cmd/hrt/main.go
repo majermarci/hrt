@@ -17,12 +17,6 @@ var (
 	allResponses []Response
 )
 
-type Response struct {
-	Test         string
-	StatusCode   string
-	ResponseBody string
-}
-
 func main() {
 	flag.Parse()
 
@@ -59,9 +53,7 @@ func main() {
 		if *tableOutput {
 			printTable(allResponses)
 		} else {
-			for _, response := range allResponses {
-				fmt.Printf("Request: %s\nStatus: %v\nBody: \n%s\n", response.Test, response.StatusCode, response.ResponseBody)
-			}
+			printResponses(allResponses)
 		}
 	} else {
 		if *requestName == "" {
@@ -81,9 +73,7 @@ func main() {
 		if *tableOutput {
 			printTable(allResponses)
 		} else {
-			for _, response := range allResponses {
-				fmt.Printf("Request: %s\nStatus: %v\nBody: \n%s\n", response.Test, response.StatusCode, response.ResponseBody)
-			}
+			printResponses(allResponses)
 		}
 	}
 

@@ -9,7 +9,19 @@ import (
 	"strings"
 )
 
+type Response struct {
+	RequestName  string
+	StatusCode   string
+	ResponseBody string
+	Method       string
+	URL          string
+}
+
 func runTest(test string, ep Endpoint, client *http.Client) Response {
+	if ep.Method == "" {
+		ep.Method = "GET"
+	}
+
 	// Perform an HTTP request for the endpoint
 	req, err := http.NewRequest(ep.Method, ep.URL, strings.NewReader(ep.Body))
 	if err != nil {
@@ -49,8 +61,10 @@ func runTest(test string, ep Endpoint, client *http.Client) Response {
 
 	// Return the response
 	return Response{
-		Test:         test,
+		RequestName:  test,
+		Method:       ep.Method,
 		StatusCode:   resp.Status,
 		ResponseBody: string(body),
+		URL:          ep.URL,
 	}
 }
