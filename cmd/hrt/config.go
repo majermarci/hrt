@@ -6,11 +6,18 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
+type BasicAuth struct {
+	Username string `yaml:"username"`
+	Password string `yaml:"password"`
+}
+
 type Endpoint struct {
-	URL     string            `yaml:"url"`
-	Method  string            `yaml:"method"`
-	Body    string            `yaml:"body"`
-	Headers map[string]string `yaml:"headers"`
+	URL         string            `yaml:"url"`
+	Method      string            `yaml:"method"`
+	Body        string            `yaml:"body"`
+	Headers     map[string]string `yaml:"headers"`
+	BasicAuth   BasicAuth         `yaml:"basic_auth"`
+	BearerToken string            `yaml:"bearer_token"`
 }
 
 func loadConfig(file string) (map[string]Endpoint, error) {

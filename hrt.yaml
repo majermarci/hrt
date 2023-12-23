@@ -12,6 +12,10 @@ mock:
   headers:
     Content-Type: application/json
     Test-Header: test1
+  basic_auth:
+    username: admin
+    password: admin
+  # bearer_token: VGhpc0lzQVRlc3RUb2tlbgo=
 
 json:
   url: https://localhost:4000/echo/json
