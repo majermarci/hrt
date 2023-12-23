@@ -1,4 +1,3 @@
-# Change these variables as necessary.
 MAIN_PACKAGE_PATH := ./cmd/hrt
 BINARY_NAME := hrt
 

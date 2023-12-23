@@ -34,15 +34,18 @@ func runTest(test string, ep Endpoint, client *http.Client) Response {
 		req.Header.Add(key, value)
 	}
 
+	// Check if both Basic Auth and Bearer Token are specified
 	if ep.BasicAuth.Username != "" && ep.BasicAuth.Password != "" && ep.BearerToken != "" {
 		fmt.Printf("Error: Both Basic Auth and Bearer Token are specified for endpoint %s.\nPlease select only one method of authentication.\n", test)
 		os.Exit(1)
 	}
 
+	// Add basic authentication to the request if specified
 	if ep.BasicAuth.Username != "" && ep.BasicAuth.Password != "" {
 		req.SetBasicAuth(ep.BasicAuth.Username, ep.BasicAuth.Password)
 	}
 
+	// Add bearer token to the request if specified
 	if ep.BearerToken != "" {
 		req.Header.Add("Authorization", "Bearer "+ep.BearerToken)
 	}

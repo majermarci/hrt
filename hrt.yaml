@@ -1,17 +1,15 @@
-# Public test site
+# Public test site, which will do a simple GET request
 example:
   url: https://example.com
-  headers:
-    Content-Type: text/plain
 
 # Mock endpoint for testing
 mock:
   url: http://localhost:8081/mock
   method: POST
-  body: '{"message": "Hello, World!"}'
   headers:
     Content-Type: application/json
-    Test-Header: test1
+    Test-Header: Test-Value
+  body: '{"message": "Hello World!"}'
   basic_auth:
     username: admin
     password: admin
@@ -20,21 +18,26 @@ mock:
 json:
   url: https://localhost:4000/echo/json
   method: GET
-  body: '{"message": "Hello, World!"}'
+  body: '{"message": "Hello World!"}'
 
 xml:
   url: https://localhost:4000/echo/xml
   method: POST
-  body: '<?xml version="1.0" encoding="UTF-8"?><soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"><soap:Body><ns4:produceServiceOrder xmlns:ns4="http://services.net/IOSS" xmlns:ns1="http://schemasnet/csdg" xmlns:ns2="http://services.net/types"><ns2:context><ns1:technicalContext><ns1:from>vendor</ns1:from><ns1:replyState>active</ns1:replyState></ns1:technicalContext><ns1:businessContext><ns1:processId>5</ns1:processId><ns1:processTypeId>manager-id</ns1:processTypeId></ns1:businessContext></ns2:context></ns4:produceServiceOrder></soap:Body></soap:Envelope>'
-  headers:
-    Content-Type: application/xml
-
-yaml:
-  url: https://localhost:4000/echo/xml
-  method: POST
-  body: |
-    Test: name
-    Test2: name2
-      Valami: test3
+  body:
+    <?xml version="1.0" encoding="UTF-8"?>
+    <soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope" xmlns:ns="http://example.com/namespace">
+        <soap:Header>
+            <ns:Authorization>
+                <Username>your_username</Username>
+                <Password>your_password</Password>
+            </ns:Authorization>
+        </soap:Header>
+        <soap:Body>
+            <ns:YourSOAPRequest>
+                <Parameter1>Value1</Parameter1>
+                <Parameter2>Value2</Parameter2>
+            </ns:YourSOAPRequest>
+        </soap:Body>
+    </soap:Envelope>
   headers:
     Content-Type: application/xml
