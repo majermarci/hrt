@@ -9,7 +9,10 @@ import (
 func printResponses(responses []Response) {
 	for _, response := range responses {
 		fmt.Printf("Request: '%v'\n%v - %v\n", response.RequestName, response.Method, response.URL)
-		fmt.Printf("Status: %v\nBody: \n%s\n", response.StatusCode, response.ResponseBody)
+		fmt.Printf("Status: %v\n", response.StatusCode)
+		if response.ResponseBody != "" {
+			fmt.Printf("Body: \n%s\n", response.ResponseBody)
+		}
 	}
 }
 

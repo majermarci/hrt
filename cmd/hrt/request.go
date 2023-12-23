@@ -10,9 +10,9 @@ import (
 )
 
 type Response struct {
+	ResponseBody string
 	RequestName  string
 	StatusCode   string
-	ResponseBody string
 	Method       string
 	URL          string
 }
@@ -61,10 +61,10 @@ func runTest(test string, ep Endpoint, client *http.Client) Response {
 
 	// Return the response
 	return Response{
-		RequestName:  test,
-		Method:       ep.Method,
-		StatusCode:   resp.Status,
 		ResponseBody: string(body),
+		RequestName:  test,
+		StatusCode:   resp.Status,
+		Method:       ep.Method,
 		URL:          ep.URL,
 	}
 }

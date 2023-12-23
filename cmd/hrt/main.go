@@ -14,17 +14,27 @@ var (
 	runAll       = flag.Bool("a", false, "Run all tests from config file")
 	insecure     = flag.Bool("k", false, "Disable certificate validation")
 	tableOutput  = flag.Bool("t", false, "Enable table output")
+	version      = flag.Bool("v", false, "Print the version")
 	allResponses []Response
+)
+
+const (
+	appVersion = "0.2.3"
 )
 
 func main() {
 	flag.Parse()
 
-	// Load the configuration file
-	conf, err := loadConfig(*confFile)
-	if err != nil {
-		fmt.Printf("Failed to load configuration file: %v\n", err)
-		os.Exit(1)
+	// If the -v flag is provided and no other flags are provided, print the version and exit
+	if *version && flag.NFlag() == 1 {
+		fmt.Println(appVersion)
+		os.Exit(0)
+	}
+
+	// If no flags are specified, print out the available flags
+	if flag.NFlag() == 0 {
+		fmt.Println("Available flags:")
+		flag.PrintDefaults()
 	}
 
 	// Create an HTTP client
@@ -37,6 +47,13 @@ func main() {
 		}
 	} else {
 		client = &http.Client{}
+	}
+
+	// Load the configuration file
+	conf, err := loadConfig(*confFile)
+	if err != nil {
+		fmt.Printf("Failed to load configuration file: %v\n", err)
+		os.Exit(1)
 	}
 
 	// If the -a option is enabled, run all tests
@@ -75,11 +92,5 @@ func main() {
 		} else {
 			printResponses(allResponses)
 		}
-	}
-
-	// If no flags are specified, print out the available flags
-	if flag.NFlag() == 0 {
-		fmt.Println("Available flags:")
-		flag.PrintDefaults()
 	}
 }
