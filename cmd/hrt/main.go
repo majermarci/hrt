@@ -2,6 +2,7 @@ package main
 
 import (
 	"crypto/tls"
+	"crypto/x509"
 	"flag"
 	"fmt"
 	"net/http"
@@ -10,6 +11,9 @@ import (
 
 var (
 	confFile     = flag.String("c", "hrt.yaml", "Specify a config file")
+	certFile     = flag.String("cert", "", "Path to the TLS certificate file")
+	keyFile      = flag.String("key", "", "Path to the TLS private key file")
+	caCertFile   = flag.String("cacert", "", "Path to the CA certificate file")
 	requestName  = flag.String("r", "", "Request to run from config file")
 	runAll       = flag.Bool("a", false, "Run all tests from config file")
 	insecure     = flag.Bool("k", false, "Disable certificate validation")
@@ -37,6 +41,29 @@ func main() {
 		flag.PrintDefaults()
 	}
 
+	// Load system CA pool
+	caCertPool, err := x509.SystemCertPool()
+	if err != nil {
+		fmt.Printf("Failed to load system CA pool: %v", err)
+		os.Exit(1)
+	}
+
+	// Append additional CA certs from file if specified
+	// var caCertPool *x509.CertPool
+	if *caCertFile != "" {
+		caCert, err := os.ReadFile(*caCertFile)
+		if err != nil {
+			fmt.Printf("Failed to read CA certificate: %v", err)
+			os.Exit(1)
+		}
+
+		// caCertPool = x509.NewCertPool()
+		if !caCertPool.AppendCertsFromPEM(caCert) {
+			fmt.Println("Failed to append CA certificate")
+			os.Exit(1)
+		}
+	}
+
 	// Create an HTTP client
 	var client *http.Client
 	if *insecure {
@@ -45,8 +72,29 @@ func main() {
 				TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
 			},
 		}
+	} else if *certFile != "" && *keyFile != "" {
+		cert, err := tls.LoadX509KeyPair(*certFile, *keyFile)
+		if err != nil {
+			fmt.Printf("Failed to load key pair: %v", err)
+			os.Exit(1)
+		}
+
+		client = &http.Client{
+			Transport: &http.Transport{
+				TLSClientConfig: &tls.Config{
+					Certificates: []tls.Certificate{cert},
+					RootCAs:      caCertPool,
+				},
+			},
+		}
 	} else {
-		client = &http.Client{}
+		client = &http.Client{
+			Transport: &http.Transport{
+				TLSClientConfig: &tls.Config{
+					RootCAs: caCertPool,
+				},
+			},
+		}
 	}
 
 	// Load the configuration file

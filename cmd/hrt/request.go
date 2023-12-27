@@ -72,9 +72,6 @@ func runTest(test string, ep Endpoint, client *http.Client) Response {
 		body, _ = json.MarshalIndent(jsonObj, "", "  ")
 	}
 
-	// fmt.Printf("Status Code for '%s': %v\n", test, resp.Status)
-	// fmt.Printf("Response Body: \n%s\n", body)
-
 	// Return the response
 	return Response{
 		ResponseBody: string(body),
