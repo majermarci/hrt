@@ -1,7 +1,10 @@
 package main
 
 import (
+	"bufio"
+	"fmt"
 	"os"
+	"strings"
 
 	"gopkg.in/yaml.v2"
 )
@@ -20,7 +23,59 @@ type Endpoint struct {
 	BearerToken string            `yaml:"bearer_token"`
 }
 
+func createDefaultConfig(file string) error {
+	defaultConfig := map[string]Endpoint{
+		"example": {
+			URL:    "http://localhost:8080",
+			Method: "GET",
+			BasicAuth: BasicAuth{
+				Username: "username",
+				Password: "password",
+			},
+			BearerToken: "your_token_here",
+		},
+	}
+
+	data, err := yaml.Marshal(&defaultConfig)
+	if err != nil {
+		return err
+	}
+
+	err = os.WriteFile(file, data, 0644)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func loadConfig(file string) (map[string]Endpoint, error) {
+	if _, err := os.Stat(file); os.IsNotExist(err) {
+		fmt.Printf("Config file '%v' does not exist.\nDo you want to create a default one? (Y/n): ", file)
+		reader := bufio.NewReader(os.Stdin)
+		response, err := reader.ReadString('\n')
+		if err != nil {
+			return nil, err
+		}
+
+		response = strings.ToLower(strings.TrimSpace(response))
+
+		if response == "" || response == "y" {
+			err := createDefaultConfig(file)
+			if err != nil {
+				return nil, err
+			}
+			fmt.Println("Default config file created. Please modify it according to your needs and run the program again.")
+			os.Exit(0)
+		} else if response == "n" {
+			fmt.Println("No config file created. Exiting.")
+			os.Exit(0)
+		} else {
+			fmt.Println("Invalid response. Exiting.")
+			os.Exit(1)
+		}
+	}
+
 	data, err := os.ReadFile(file)
 	if err != nil {
 		return nil, err

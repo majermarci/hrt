@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"strings"
 )
 
 var (
@@ -23,7 +24,7 @@ var (
 )
 
 const (
-	appVersion = "0.2.3"
+	appVersion = "0.2.6"
 )
 
 func main() {
@@ -39,6 +40,14 @@ func main() {
 	if flag.NFlag() == 0 {
 		fmt.Println("Available flags:")
 		flag.PrintDefaults()
+	}
+
+	// Check if the default config file exists
+	if _, err := os.Stat(*confFile); os.IsNotExist(err) {
+		// If the default config file does not exist, check if the alternative config file exists
+		if _, err := os.Stat(strings.TrimSuffix(*confFile, "yaml") + "yml"); err == nil {
+			*confFile = strings.TrimSuffix(*confFile, "yaml") + "yml"
+		}
 	}
 
 	// Load system CA pool

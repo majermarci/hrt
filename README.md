@@ -33,6 +33,6 @@ sudo install -m 755 hrt /usr/local/bin
 - Add OAuth2 auth option
 - Add timeout options for each request
 - ~~Add option to call with specific certificate~~
-- Make an example config output, and offer to create it
+- ~~Make an example config output, and offer to create it~~
 - Autocomplete the request names from default config
 - Interactive TUI with dynamic output and selection (?)
