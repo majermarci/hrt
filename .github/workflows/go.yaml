@@ -1,0 +1,73 @@
+name: Go
+
+on:
+  # release:
+  #   types:
+  #     - created
+  push:
+    branches: [release]
+  pull_request:
+    branches: [main]
+
+jobs:
+
+  audit:
+    runs-on: ubuntu-22.04
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Set up Go
+      uses: actions/setup-go@v4
+      with:
+        go-version: 1.21
+
+    - name: Verify dependencies
+      run: go mod verify
+
+    - name: Build
+      run: go build -v ./...
+
+    - name: Run go vet
+      run: go vet ./...
+
+    - name: Install staticcheck
+      run: go install honnef.co/go/tools/cmd/staticcheck@latest
+
+    - name: Run staticcheck
+      run: staticcheck ./...
+
+    - name: Install golint
+      run: go install golang.org/x/lint/golint@latest
+
+    - name: Run golint
+      run: golint ./...
+
+    - name: Run tests
+      run: go test -race -vet=off ./...
+
+  build:
+    name: Build for Linux and Darwin
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.21'
+
+      - name: Build for Linux
+        run: GOOS=linux GOARCH=amd64 go build -v -o packages/myapp-linux-amd64 ./cmd/api
+        
+      - name: Build for Darwin
+        run: GOOS=darwin GOARCH=amd64 go build -o packages/myapp-darwin-amd64 ./cmd/api
+
+      - name: List Artifacts
+        run: ls -R packages/
+        
+      # - name: Upload Artifacts
+      #   uses: actions/upload-artifact@v2
+      #   with:
+      #     name: binaries
+      #     path: packages/
