@@ -1,6 +1,7 @@
 package main
 
 import (
+	"crypto/tls"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -10,11 +11,14 @@ import (
 )
 
 type Response struct {
-	ResponseBody string
-	RequestName  string
-	StatusCode   string
-	Method       string
-	URL          string
+	ResponseHeaders http.Header
+	RequestHeaders  http.Header
+	ResponseBody    string
+	RequestName     string
+	StatusCode      string
+	TLSInfo         *tls.ConnectionState
+	Method          string
+	URL             string
 }
 
 func runTest(test string, ep Endpoint, client *http.Client) Response {
@@ -74,10 +78,13 @@ func runTest(test string, ep Endpoint, client *http.Client) Response {
 
 	// Return the response
 	return Response{
-		ResponseBody: string(body),
-		RequestName:  test,
-		StatusCode:   resp.Status,
-		Method:       ep.Method,
-		URL:          ep.URL,
+		ResponseHeaders: resp.Header,
+		RequestHeaders:  req.Header,
+		ResponseBody:    string(body),
+		RequestName:     test,
+		StatusCode:      resp.Status,
+		TLSInfo:         resp.TLS,
+		Method:          ep.Method,
+		URL:             ep.URL,
 	}
 }

@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"os"
 	"strings"
+	"time"
 )
 
 var (
@@ -16,15 +17,17 @@ var (
 	keyFile      = flag.String("key", "", "Path to the TLS private key file")
 	caCertFile   = flag.String("cacert", "", "Path to the CA certificate file")
 	requestName  = flag.String("r", "", "Request to run from config file")
+	timeout      = flag.Int("t", 30, "Timeout for the HTTP client in seconds")
 	runAll       = flag.Bool("a", false, "Run all tests from config file")
 	insecure     = flag.Bool("k", false, "Disable certificate validation")
-	tableOutput  = flag.Bool("t", false, "Enable table output")
-	version      = flag.Bool("v", false, "Print the version")
+	tableOutput  = flag.Bool("table", false, "Enable table output")
+	verbose      = flag.Bool("v", false, "Enable verbose TLS details")
+	version      = flag.Bool("version", false, "Print the version")
 	allResponses []Response
 )
 
 const (
-	appVersion = "0.2.6"
+	appVersion = "0.2.9"
 )
 
 func main() {
@@ -77,6 +80,7 @@ func main() {
 	var client *http.Client
 	if *insecure {
 		client = &http.Client{
+			Timeout: time.Duration(*timeout) * time.Second,
 			Transport: &http.Transport{
 				TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
 			},
@@ -89,6 +93,7 @@ func main() {
 		}
 
 		client = &http.Client{
+			Timeout: time.Duration(*timeout) * time.Second,
 			Transport: &http.Transport{
 				TLSClientConfig: &tls.Config{
 					Certificates: []tls.Certificate{cert},
@@ -98,6 +103,7 @@ func main() {
 		}
 	} else {
 		client = &http.Client{
+			Timeout: time.Duration(*timeout) * time.Second,
 			Transport: &http.Transport{
 				TLSClientConfig: &tls.Config{
 					RootCAs: caCertPool,

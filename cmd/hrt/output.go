@@ -1,6 +1,7 @@
 package main
 
 import (
+	"crypto/tls"
 	"fmt"
 	"strings"
 )
@@ -8,10 +9,76 @@ import (
 // Helper function to print responses
 func printResponses(responses []Response) {
 	for _, response := range responses {
-		fmt.Printf("Request: '%v'\n%v - %v\n", response.RequestName, response.Method, response.URL)
+		// Print TLS details
+		if *verbose && response.TLSInfo != nil {
+			fmt.Printf("TLS details for endpoint '%s'\n", response.RequestName)
+			tlsVersion := map[uint16]string{
+				tls.VersionTLS10: "1.0",
+				tls.VersionTLS11: "1.1",
+				tls.VersionTLS12: "1.2",
+				tls.VersionTLS13: "1.3",
+			}
+			fmt.Printf("  TLS version: %s\n", tlsVersion[response.TLSInfo.Version])
+
+			tlsCipherSuite := map[uint16]string{
+				tls.TLS_AES_128_GCM_SHA256:                        "TLS_AES_128_GCM_SHA256",
+				tls.TLS_AES_256_GCM_SHA384:                        "TLS_AES_256_GCM_SHA384",
+				tls.TLS_CHACHA20_POLY1305_SHA256:                  "TLS_CHACHA20_POLY1305_SHA256",
+				tls.TLS_RSA_WITH_RC4_128_SHA:                      "TLS_RSA_WITH_RC4_128_SHA",
+				tls.TLS_RSA_WITH_3DES_EDE_CBC_SHA:                 "TLS_RSA_WITH_3DES_EDE_CBC_SHA",
+				tls.TLS_RSA_WITH_AES_128_CBC_SHA:                  "TLS_RSA_WITH_AES_128_CBC_SHA",
+				tls.TLS_RSA_WITH_AES_256_CBC_SHA:                  "TLS_RSA_WITH_AES_256_CBC_SHA",
+				tls.TLS_RSA_WITH_AES_128_CBC_SHA256:               "TLS_RSA_WITH_AES_128_CBC_SHA256",
+				tls.TLS_RSA_WITH_AES_128_GCM_SHA256:               "TLS_RSA_WITH_AES_128_GCM_SHA256",
+				tls.TLS_RSA_WITH_AES_256_GCM_SHA384:               "TLS_RSA_WITH_AES_256_GCM_SHA384",
+				tls.TLS_ECDHE_ECDSA_WITH_RC4_128_SHA:              "TLS_ECDHE_ECDSA_WITH_RC4_128_SHA",
+				tls.TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA:          "TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA",
+				tls.TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA:          "TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA",
+				tls.TLS_ECDHE_RSA_WITH_RC4_128_SHA:                "TLS_ECDHE_RSA_WITH_RC4_128_SHA",
+				tls.TLS_ECDHE_RSA_WITH_3DES_EDE_CBC_SHA:           "TLS_ECDHE_RSA_WITH_3DES_EDE_CBC_SHA",
+				tls.TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA:            "TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA",
+				tls.TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA:            "TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA",
+				tls.TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA256:       "TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA256",
+				tls.TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256:         "TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256",
+				tls.TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256:         "TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256",
+				tls.TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256:       "TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256",
+				tls.TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384:         "TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384",
+				tls.TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384:       "TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384",
+				tls.TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256:   "TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256",
+				tls.TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256: "TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256",
+			}
+			fmt.Printf("  Cipher suite: %s\n", tlsCipherSuite[response.TLSInfo.CipherSuite])
+			fmt.Printf("  Server name: %s\n", response.TLSInfo.ServerName)
+			if response.TLSInfo.PeerCertificates != nil && len(response.TLSInfo.PeerCertificates) > 0 {
+				fmt.Printf("  Peer certificate: %v\n", response.TLSInfo.PeerCertificates[0].Subject)
+				fmt.Printf("  Issuer: %v\n\n", response.TLSInfo.PeerCertificates[0].Issuer)
+			}
+		}
+
+		// Print all request headers if verbose is enabled
+		if *verbose && len(response.RequestHeaders) > 0 {
+			fmt.Println("Request Headers:")
+			for key, values := range response.RequestHeaders {
+				for _, value := range values {
+					fmt.Printf("  %s: %s\n", key, value)
+				}
+			}
+		}
+
+		// Print response headers if verbose is enabled
+		if *verbose && len(response.ResponseHeaders) > 0 {
+			fmt.Println("Response Headers:")
+			for key, values := range response.ResponseHeaders {
+				for _, value := range values {
+					fmt.Printf("  %s: %s\n", key, value)
+				}
+			}
+		}
+
+		fmt.Printf("\nRequest: '%v' - %v %v\n", response.RequestName, response.Method, response.URL)
 		fmt.Printf("Status: %v\n", response.StatusCode)
 		if response.ResponseBody != "" {
-			fmt.Printf("Body: \n%s\n", response.ResponseBody)
+			fmt.Printf("\nResponse Body:\n %v\n", response.ResponseBody)
 		}
 	}
 }
