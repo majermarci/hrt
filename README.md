@@ -7,6 +7,8 @@ This app works with a simple and easy-to-back-up yaml configuration, which can b
 
 ## Installing
 
+If you have Go installed, you can install the app with the following command:
+
 ```bash
 go install github.com/majermarci/hrt@latest
 ```
@@ -33,6 +35,7 @@ sudo install -m 755 hrt /usr/local/bin
 - Add OAuth2 auth option
 - ~~Add option to call with specific certificate~~
 - ~~Make an example config output, and offer to create it~~
+- Better support for HEAD and OPTIONS methods
 - Create listing for all available requests with no option given
 - Autocomplete the request names from default config
 - Interactive TUI with dynamic output and selection (?)

@@ -1,0 +1,24 @@
+# Request's name that will be used when you run the command
+example:
+  # URL of the request. Format: scheme://host:port/path
+  # REQUIRED!
+  url: http://localhost:8080
+  # HTTP method of the request. Supported methods: GET, POST, PUT, PATCH, DELETE
+  # Default: GET
+  method: GET
+  # Body of the request. Can be a string or empty.
+  body: |
+    {
+      "key": "value"
+    }
+  # Basic auth credentials of the request.
+  basic_auth:
+    username: username
+    password: password
+  # Optionally you can use bearer token instead of basic auth.
+  # You cannot use both basic auth and bearer token at the same time!
+  bearer_token: your_token_here
+  # Headers of the request.
+  headers:
+    X-Header-1: value1
+    X-Header-2: value2

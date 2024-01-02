@@ -2,12 +2,16 @@ package main
 
 import (
 	"bufio"
+	"embed"
 	"fmt"
 	"os"
 	"strings"
 
 	"gopkg.in/yaml.v2"
 )
+
+//go:embed example_config.yaml
+var Files embed.FS
 
 type BasicAuth struct {
 	Username string `yaml:"username"`
@@ -24,24 +28,26 @@ type Endpoint struct {
 }
 
 func createDefaultConfig(file string) error {
-	defaultConfig := map[string]Endpoint{
-		"example": {
-			URL:    "http://localhost:8080",
-			Method: "GET",
-			BasicAuth: BasicAuth{
-				Username: "username",
-				Password: "password",
-			},
-			BearerToken: "your_token_here",
-		},
-	}
+	// defaultConfig := map[string]Endpoint{
+	// 	"example": {
+	// 		URL:    "http://localhost:8080",
+	// 		Method: "GET",
+	// 		BasicAuth: BasicAuth{
+	// 			Username: "username",
+	// 			Password: "password",
+	// 		},
+	// 		BearerToken: "your_token_here",
+	// 	},
+	// }
 
-	data, err := yaml.Marshal(&defaultConfig)
-	if err != nil {
-		return err
-	}
+	// data, err := yaml.Marshal(&defaultConfig)
+	// if err != nil {
+	// 	return err
+	// }
 
-	err = os.WriteFile(file, data, 0644)
+	exampleConfig, err := Files.ReadFile("example_config.yaml")
+
+	err = os.WriteFile(file, exampleConfig, 0644)
 	if err != nil {
 		return err
 	}
