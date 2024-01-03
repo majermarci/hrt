@@ -8,6 +8,10 @@ import (
 
 // Helper function to print responses
 func printResponses(responses []Response) {
+	if *verbose {
+		fmt.Printf("Used config file: %s\n\n", *confFile)
+	}
+
 	for _, response := range responses {
 		// Print TLS details
 		if *verbose && response.TLSInfo != nil {
@@ -89,6 +93,7 @@ func printTable(responses []Response) {
 	statusWidth := len("Status Code")
 	bodyWidth := len("Response Body")
 
+	// Find the longest value for each column
 	for _, response := range responses {
 		if len(response.RequestName) > testWidth {
 			testWidth = len(response.RequestName)

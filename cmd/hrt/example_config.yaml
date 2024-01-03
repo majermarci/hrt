@@ -12,12 +12,12 @@ example:
       "key": "value"
     }
   # Basic auth credentials of the request.
+  # You cannot use both basic auth and bearer token at the same time!
   basic_auth:
     username: username
     password: password
   # Optionally you can use bearer token instead of basic auth.
-  # You cannot use both basic auth and bearer token at the same time!
-  bearer_token: your_token_here
+  bearer_token: your_token
   # Headers of the request.
   headers:
     X-Header-1: value1

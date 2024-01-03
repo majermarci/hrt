@@ -7,12 +7,15 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"os/user"
+	"path/filepath"
 	"strings"
 	"time"
 )
 
 var (
-	confFile     = flag.String("c", "hrt.yaml", "Specify a config file")
+	cmdName      = filepath.Base(os.Args[0])
+	confFile     = flag.String("c", cmdName+".yaml", "Specify a config file")
 	certFile     = flag.String("cert", "", "Path to the TLS certificate file")
 	keyFile      = flag.String("key", "", "Path to the TLS private key file")
 	caCertFile   = flag.String("cacert", "", "Path to the CA certificate file")
@@ -20,14 +23,14 @@ var (
 	timeout      = flag.Int("t", 30, "Timeout for the HTTP client in seconds")
 	runAll       = flag.Bool("a", false, "Run all tests from config file")
 	insecure     = flag.Bool("k", false, "Disable certificate validation")
-	tableOutput  = flag.Bool("table", false, "Enable table output")
+	tableOutput  = flag.Bool("table", false, "Enable table output (experimental)")
 	verbose      = flag.Bool("v", false, "Enable verbose TLS details")
 	version      = flag.Bool("version", false, "Print the version")
 	allResponses []Response
 )
 
 const (
-	appVersion = "0.2.9"
+	appVersion = "0.3.1"
 )
 
 func main() {
@@ -45,11 +48,24 @@ func main() {
 		flag.PrintDefaults()
 	}
 
-	// Check if the default config file exists
+	// Check if the local config file exists
 	if _, err := os.Stat(*confFile); os.IsNotExist(err) {
-		// If the default config file does not exist, check if the alternative config file exists
-		if _, err := os.Stat(strings.TrimSuffix(*confFile, "yaml") + "yml"); err == nil {
-			*confFile = strings.TrimSuffix(*confFile, "yaml") + "yml"
+		// If the local config file does not exist, check for the default config file
+		usr, err := user.Current()
+		if err != nil {
+			fmt.Printf("Failed to get current user: %v", err)
+			os.Exit(1)
+		}
+
+		// Check if the global config file exists and use it if it does
+		globalConfFile := filepath.Join(usr.HomeDir, ".config", cmdName, "config.yaml")
+		if _, err := os.Stat(globalConfFile); err == nil {
+			*confFile = globalConfFile
+		} else {
+			// If the default config file does not exist, check if the alternative config file exists
+			if _, err := os.Stat(strings.TrimSuffix(*confFile, "yaml") + "yml"); err == nil {
+				*confFile = strings.TrimSuffix(*confFile, "yaml") + "yml"
+			}
 		}
 	}
 

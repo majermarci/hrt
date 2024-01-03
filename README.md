@@ -36,7 +36,7 @@ sudo install -m 755 hrt /usr/local/bin
 - ~~Add option to call with specific certificate~~
 - ~~Make an example config output, and offer to create it~~
 - Better support for HEAD and OPTIONS methods
-- Default config search in `$HOME/.config/hrt/config.yaml`, but prioritize local config
+- ~~Default config search in `$HOME/.config/hrt/config.yaml`, but prioritize local config~~
 - Create listing for all available requests with no option given
 - Autocomplete the request names from default config
 - Interactive TUI with dynamic output and selection (?)
