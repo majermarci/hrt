@@ -6,6 +6,10 @@ example:
   # HTTP method of the request. Supported methods: GET, POST, PUT, PATCH, DELETE
   # Default: GET
   method: GET
+  # Headers of the request.
+  headers:
+    X-Header-1: value1
+    X-Header-2: value2
   # Body of the request. Can be a string or empty.
   body: |
     {
@@ -18,7 +22,5 @@ example:
     password: password
   # Optionally you can use bearer token instead of basic auth.
   bearer_token: your_token
-  # Headers of the request.
-  headers:
-    X-Header-1: value1
-    X-Header-2: value2
+
+# Repeat the same structure for other requests.

@@ -4,14 +4,17 @@ import (
 	"bufio"
 	"embed"
 	"fmt"
+	"log"
 	"os"
+	"os/user"
+	"path/filepath"
 	"strings"
 
 	"gopkg.in/yaml.v2"
 )
 
 //go:embed example_config.yaml
-var Files embed.FS
+var files embed.FS
 
 type BasicAuth struct {
 	Username string `yaml:"username"`
@@ -27,27 +30,50 @@ type Endpoint struct {
 	BearerToken string            `yaml:"bearer_token"`
 }
 
-func createDefaultConfig(file string) error {
-	// defaultConfig := map[string]Endpoint{
-	// 	"example": {
-	// 		URL:    "http://localhost:8080",
-	// 		Method: "GET",
-	// 		BasicAuth: BasicAuth{
-	// 			Username: "username",
-	// 			Password: "password",
-	// 		},
-	// 		BearerToken: "your_token_here",
-	// 	},
-	// }
+func checkConfig(confFile *string, createGlobal *bool) {
+	usr, err := user.Current()
+	if err != nil {
+		log.Fatalf("Failed to get current user: %v", err)
+	}
 
-	// data, err := yaml.Marshal(&defaultConfig)
-	// if err != nil {
-	// 	return err
-	// }
+	globalConfFile := filepath.Join(usr.HomeDir, ".config", cmdName, "config.yaml")
 
-	exampleConfig, err := Files.ReadFile("example_config.yaml")
+	if *createGlobal {
+		if _, err := os.Stat(globalConfFile); err == nil {
+			fmt.Printf("Global config file already exists at %s\n", globalConfFile)
+			fmt.Println("Please edit the config file to your needs and try again.")
+			os.Exit(0)
+		} else {
+			err := os.MkdirAll(filepath.Dir(globalConfFile), 0700)
+			if err != nil {
+				log.Fatalf("Failed to create config directory: %v", err)
+			}
 
-	err = os.WriteFile(file, exampleConfig, 0644)
+			createConfig(globalConfFile)
+
+			fmt.Printf("Created global config file at %s\n", globalConfFile)
+			fmt.Println("Please edit the config file to your needs and try again.")
+			os.Exit(0)
+		}
+	}
+
+	if *confFile == cmdName+".yaml" {
+		if _, err := os.Stat(*confFile); os.IsNotExist(err) {
+			if _, err := os.Stat(strings.TrimSuffix(*confFile, "yaml") + "yml"); err == nil {
+				*confFile = strings.TrimSuffix(*confFile, "yaml") + "yml"
+			} else {
+				if _, err := os.Stat(globalConfFile); err == nil {
+					*confFile = globalConfFile
+				}
+			}
+		}
+	}
+}
+
+func createConfig(file string) error {
+	exampleConfig, err := files.ReadFile("example_config.yaml")
+
+	err = os.WriteFile(file, exampleConfig, 0600)
 	if err != nil {
 		return err
 	}
@@ -57,7 +83,7 @@ func createDefaultConfig(file string) error {
 
 func loadConfig(file string) (map[string]Endpoint, error) {
 	if _, err := os.Stat(file); os.IsNotExist(err) {
-		fmt.Printf("Config file '%v' does not exist.\nDo you want to create a default one? (Y/n): ", file)
+		fmt.Printf("Config file '%v' does not exist.\nDo you want to create it? (Y/n): ", file)
 		reader := bufio.NewReader(os.Stdin)
 		response, err := reader.ReadString('\n')
 		if err != nil {
@@ -67,17 +93,17 @@ func loadConfig(file string) (map[string]Endpoint, error) {
 		response = strings.ToLower(strings.TrimSpace(response))
 
 		if response == "" || response == "y" {
-			err := createDefaultConfig(file)
+			err := createConfig(file)
 			if err != nil {
 				return nil, err
 			}
-			fmt.Println("Default config file created. Please modify it according to your needs and run the program again.")
+			fmt.Println("\nDefault config file created.\nPlease modify it according to your needs and run the program again.")
 			os.Exit(0)
 		} else if response == "n" {
-			fmt.Println("No config file created. Exiting.")
+			fmt.Println("\nNo config file created. Check '-h' for options.\nExiting.")
 			os.Exit(0)
 		} else {
-			fmt.Println("Invalid response. Exiting.")
+			fmt.Println("\nInvalid response. Exiting.")
 			os.Exit(1)
 		}
 	}

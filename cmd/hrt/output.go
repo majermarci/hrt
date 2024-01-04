@@ -8,10 +8,6 @@ import (
 
 // Helper function to print responses
 func printResponses(responses []Response) {
-	if *moreVerbose {
-		fmt.Printf("Used config file: %s\n\n", *confFile)
-	}
-
 	for _, response := range responses {
 		// Print TLS details
 		if *moreVerbose && response.TLSInfo != nil {
@@ -80,7 +76,7 @@ func printResponses(responses []Response) {
 		}
 
 		if *verbose || *moreVerbose {
-			fmt.Printf("\nRequest: '%v' - %v %v\n", response.RequestName, response.Method, response.URL)
+			fmt.Printf("Request: '%v' - %v %v\n", response.RequestName, response.Method, response.URL)
 			fmt.Printf("Status: %v\n", response.StatusCode)
 			fmt.Println("\nResponse Body:")
 		}

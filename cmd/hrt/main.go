@@ -7,9 +7,7 @@ import (
 	"fmt"
 	"net/http"
 	"os"
-	"os/user"
 	"path/filepath"
-	"strings"
 	"time"
 )
 
@@ -21,6 +19,7 @@ var (
 	caCertFile   = flag.String("cacert", "", "Path to the CA certificate file")
 	requestName  = flag.String("r", "", "Request to run from config file")
 	timeout      = flag.Int("t", 30, "Timeout for the HTTP client in seconds")
+	createGlobal = flag.Bool("g", false, "Create a global config file")
 	runAll       = flag.Bool("a", false, "Run all tests from config file")
 	insecure     = flag.Bool("k", false, "Disable certificate validation")
 	tableOutput  = flag.Bool("table", false, "Enable table output (experimental)")
@@ -31,7 +30,7 @@ var (
 )
 
 const (
-	appVersion = "0.3.2"
+	appVersion = "0.3.5"
 )
 
 func main() {
@@ -43,31 +42,23 @@ func main() {
 		os.Exit(0)
 	}
 
-	// If no flags are specified, print out the available flags
-	if flag.NFlag() == 0 {
-		fmt.Println("Available flags:")
-		flag.PrintDefaults()
+	// // If no flags are specified, print out the available flags
+	// if flag.NFlag() == 0 {
+	// 	fmt.Println("Available flags:")
+	// 	flag.PrintDefaults()
+	// }
+
+	checkConfig(confFile, createGlobal)
+
+	// Load the configuration file
+	conf, err := loadConfig(*confFile)
+	if err != nil {
+		fmt.Printf("Failed to load configuration file: %v\n", err)
+		os.Exit(1)
 	}
 
-	// Check if the local config file exists
-	if _, err := os.Stat(*confFile); os.IsNotExist(err) {
-		// If the local config file does not exist, check for the default config file
-		usr, err := user.Current()
-		if err != nil {
-			fmt.Printf("Failed to get current user: %v", err)
-			os.Exit(1)
-		}
-
-		// Check if the global config file exists and use it if it does
-		globalConfFile := filepath.Join(usr.HomeDir, ".config", cmdName, "config.yaml")
-		if _, err := os.Stat(globalConfFile); err == nil {
-			*confFile = globalConfFile
-		} else {
-			// If the default config file does not exist, check if the alternative config file exists
-			if _, err := os.Stat(strings.TrimSuffix(*confFile, "yaml") + "yml"); err == nil {
-				*confFile = strings.TrimSuffix(*confFile, "yaml") + "yml"
-			}
-		}
+	if *verbose || *moreVerbose {
+		fmt.Printf("Used config file: %s\n\n", *confFile)
 	}
 
 	// Load system CA pool
@@ -129,13 +120,6 @@ func main() {
 		}
 	}
 
-	// Load the configuration file
-	conf, err := loadConfig(*confFile)
-	if err != nil {
-		fmt.Printf("Failed to load configuration file: %v\n", err)
-		os.Exit(1)
-	}
-
 	// If the -a option is enabled, run all tests
 	if *runAll {
 		if *requestName != "" {
@@ -155,6 +139,7 @@ func main() {
 	} else {
 		if *requestName == "" {
 			fmt.Println("Please specify a request to run using the '-r' flag")
+			fmt.Println("Check the '-h' flag for additional help.")
 			os.Exit(1)
 		}
 
