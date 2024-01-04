@@ -24,13 +24,14 @@ var (
 	runAll       = flag.Bool("a", false, "Run all tests from config file")
 	insecure     = flag.Bool("k", false, "Disable certificate validation")
 	tableOutput  = flag.Bool("table", false, "Enable table output (experimental)")
-	verbose      = flag.Bool("v", false, "Enable verbose TLS details")
+	verbose      = flag.Bool("v", false, "Enable verbose Request details")
+	moreVerbose  = flag.Bool("vv", false, "Enable verbose Request and TLS details")
 	version      = flag.Bool("version", false, "Print the version")
 	allResponses []Response
 )
 
 const (
-	appVersion = "0.3.1"
+	appVersion = "0.3.2"
 )
 
 func main() {

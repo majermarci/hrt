@@ -70,7 +70,7 @@ func runTest(test string, ep Endpoint, client *http.Client) Response {
 	}
 
 	// Try to unmarshal the body into a JSON object
-	var jsonObj map[string]interface{}
+	var jsonObj interface{}
 	if err := json.Unmarshal(body, &jsonObj); err == nil {
 		// If successful, re-marshal it with indentation
 		body, _ = json.MarshalIndent(jsonObj, "", "  ")

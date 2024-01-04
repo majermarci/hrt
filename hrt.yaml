@@ -2,6 +2,32 @@
 example:
   url: https://example.com
 
+httpbin:
+  url: https://httpbin.org/
+  method: POST
+  body: |
+    {
+      "message": "Hello World!"
+    }
+  basic_auth:
+    username: admin
+    password: admin
+  headers:
+    Content-Type: application/json
+    Test-Header: Test-Value
+
+echo:
+  url: https://echo.free.beeceptor.com
+  method: POST
+  body: |
+    {
+      "message": "Hello World!"
+    }
+  bearer_token: VGhpc0lzQVRlc3RUb2tlbgo=
+  headers:
+    Content-Type: application/json
+    Test-Header: Test-Value
+
 # Mock endpoint for testing
 mock:
   url: http://localhost:8081/mock

@@ -8,13 +8,13 @@ import (
 
 // Helper function to print responses
 func printResponses(responses []Response) {
-	if *verbose {
+	if *moreVerbose {
 		fmt.Printf("Used config file: %s\n\n", *confFile)
 	}
 
 	for _, response := range responses {
 		// Print TLS details
-		if *verbose && response.TLSInfo != nil {
+		if *moreVerbose && response.TLSInfo != nil {
 			fmt.Printf("TLS details for endpoint '%s'\n", response.RequestName)
 			tlsVersion := map[uint16]string{
 				tls.VersionTLS10: "1.0",
@@ -60,7 +60,7 @@ func printResponses(responses []Response) {
 		}
 
 		// Print all request headers if verbose is enabled
-		if *verbose && len(response.RequestHeaders) > 0 {
+		if *moreVerbose && len(response.RequestHeaders) > 0 {
 			fmt.Println("Request Headers:")
 			for key, values := range response.RequestHeaders {
 				for _, value := range values {
@@ -70,7 +70,7 @@ func printResponses(responses []Response) {
 		}
 
 		// Print response headers if verbose is enabled
-		if *verbose && len(response.ResponseHeaders) > 0 {
+		if *moreVerbose && len(response.ResponseHeaders) > 0 {
 			fmt.Println("Response Headers:")
 			for key, values := range response.ResponseHeaders {
 				for _, value := range values {
@@ -79,10 +79,14 @@ func printResponses(responses []Response) {
 			}
 		}
 
-		fmt.Printf("\nRequest: '%v' - %v %v\n", response.RequestName, response.Method, response.URL)
-		fmt.Printf("Status: %v\n", response.StatusCode)
+		if *verbose || *moreVerbose {
+			fmt.Printf("\nRequest: '%v' - %v %v\n", response.RequestName, response.Method, response.URL)
+			fmt.Printf("Status: %v\n", response.StatusCode)
+			fmt.Println("\nResponse Body:")
+		}
+
 		if response.ResponseBody != "" {
-			fmt.Printf("\nResponse Body:\n %v\n", response.ResponseBody)
+			fmt.Println(response.ResponseBody)
 		}
 	}
 }
