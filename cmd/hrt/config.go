@@ -15,7 +15,7 @@ import (
 //go:embed example_config.yaml
 var files embed.FS
 
-type BasicAuth struct {
+type basicAuth struct {
 	Username string `yaml:"username"`
 	Password string `yaml:"password"`
 }
@@ -25,7 +25,7 @@ type Endpoint struct {
 	Method      string            `yaml:"method"`
 	Body        string            `yaml:"body"`
 	Headers     map[string]string `yaml:"headers"`
-	BasicAuth   BasicAuth         `yaml:"basic_auth"`
+	BasicAuth   basicAuth         `yaml:"basic_auth"`
 	BearerToken string            `yaml:"bearer_token"`
 }
 
