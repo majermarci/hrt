@@ -1,4 +1,4 @@
-name: Go CI/CD
+name: Main CI/CD
 
 on:
   push:
@@ -13,7 +13,7 @@ on:
 jobs:
   audit:
     runs-on: ubuntu-latest
-    if: github.event_name == 'push' || github.event_name == 'release'
+    if: github.event_name == 'push' #|| github.event_name == 'release'
     steps:
     - uses: actions/checkout@v3
 
@@ -38,7 +38,7 @@ jobs:
       run: go test -race -vet=off ./...
 
   build:
-    needs: audit
+    # needs: audit
     if: github.event_name == 'release'
     runs-on: ubuntu-latest
     strategy:
@@ -46,6 +46,8 @@ jobs:
         include:
           - platform: linux
             arch: amd64
+          - platform: linux
+            arch: arm64
           # - platform: darwin
           #   arch: amd64
     steps:
