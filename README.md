@@ -20,11 +20,11 @@ The app is still in early development (and it is a learning project for me), but
   - Verbose outputs showing request and TLS details
   - Option to run every request in currently used collection file
 
-### Usage
+## Usage
 
 For usage information, run `hrt -h` or read about options at the [documentation](usage.md) page.
 
-## Installing with Go
+## Installing
 
 If you have Go installed, you can install the app with the following command:
 
