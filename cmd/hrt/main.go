@@ -18,7 +18,7 @@ var (
 	keyFile      = flag.String("key", "", "Path to the TLS private key file")
 	caCertFile   = flag.String("cacert", "", "Path to the CA certificate file")
 	requestName  = flag.String("r", "", "Request to run from config file")
-	timeout      = flag.Int("t", 30, "Timeout for the HTTP client in seconds")
+	timeout      = flag.Int("t", 10, "Timeout for the HTTP client in seconds")
 	listRequests = flag.Bool("l", false, "List all available requests in the current config file")
 	createGlobal = flag.Bool("g", false, "Create a global config file")
 	runAll       = flag.Bool("a", false, "Run all tests from config file")
@@ -28,18 +28,23 @@ var (
 	moreVerbose  = flag.Bool("vv", false, "Enable verbose Request and TLS details")
 	version      = flag.Bool("version", false, "Print the version")
 	allResponses []reqResult
+	commitID     string
 )
 
 const (
-	appVersion = "v0.4.1"
+	appVersion = "v0.4.2"
 )
 
 func main() {
 	flag.Parse()
 
-	// If the -v flag is provided and no other flags are provided, print the version and exit
+	// If the -version flag is provided and no other flags are provided, print the version and exit
 	if *version && flag.NFlag() == 1 {
-		fmt.Println(appVersion)
+		if commitID != "" {
+			fmt.Printf("%s, commit %s\n", appVersion, commitID)
+		} else {
+			fmt.Println(appVersion)
+		}
 		os.Exit(0)
 	}
 

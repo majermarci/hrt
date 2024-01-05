@@ -13,5 +13,5 @@ audit:
 	go test -vet=off -buildvcs -race ./...
 
 build:
-	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -trimpath -a -installsuffix cgo -o=${BINARY_PATH}_linux_amd64 ${PACKAGE}
-	CGO_ENABLED=0 GOOS=darwin GOARCH=arm64 go build -trimpath -a -installsuffix cgo -o=${BINARY_PATH}_darwin_arm64 ${PACKAGE}
+	# CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -trimpath -a -ldflags "-s -w -X main.commitID=$(shell git rev-parse --short HEAD)" -installsuffix cgo -o=${BINARY_PATH}_linux_amd64 ${PACKAGE}
+	CGO_ENABLED=0 go build -trimpath -a -ldflags "-s -w -X main.commitID=$(shell git rev-parse --short HEAD)" -installsuffix cgo -o=${BINARY_PATH} ${PACKAGE}
