@@ -6,7 +6,7 @@ import (
 	"strings"
 )
 
-func printTLSInfo(response Response) {
+func printTLSInfo(response reqResult) {
 	fmt.Printf("\nTLS details for endpoint '%s'\n", response.RequestName)
 	tlsVersion := map[uint16]string{
 		tls.VersionTLS10: "1.0",
@@ -61,13 +61,13 @@ func printHeaders(headerType string, headers map[string][]string) {
 	}
 }
 
-func printResponseBody(response Response) {
+func printResponseBody(response reqResult) {
 	if response.ResponseBody != "" {
 		fmt.Println(response.ResponseBody)
 	}
 }
 
-func printResponses(responses []Response) {
+func printResponses(responses []reqResult) {
 	for _, response := range responses {
 		if *moreVerbose && response.TLSInfo != nil {
 			printTLSInfo(response)
@@ -91,7 +91,7 @@ func printResponses(responses []Response) {
 	}
 }
 
-func printTable(responses []Response) {
+func printTable(responses []reqResult) {
 	// Determine the width of each column
 	testWidth := len("Request")
 	statusWidth := len("Status Code")

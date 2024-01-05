@@ -20,7 +20,7 @@ type basicAuth struct {
 	Password string `yaml:"password"`
 }
 
-type Endpoint struct {
+type endpoint struct {
 	URL         string            `yaml:"url"`
 	Method      string            `yaml:"method"`
 	Body        string            `yaml:"body"`
@@ -113,7 +113,7 @@ func checkConfig(confFile *string, createGlobal *bool) {
 	}
 }
 
-func loadConfig(file string) (map[string]Endpoint, error) {
+func loadConfig(file string) (map[string]endpoint, error) {
 	if !checkConfigExists(file) {
 		response, err := getUserInput(fmt.Sprintf("Config file '%v' does not exist.\nDo you want to create it? (Y/n): ", file))
 		if err != nil {
@@ -143,7 +143,7 @@ func loadConfig(file string) (map[string]Endpoint, error) {
 	}
 
 	// Unmarshal the YAML data into a map of Endpoint structs
-	var c map[string]Endpoint
+	var c map[string]endpoint
 	err = yaml.Unmarshal(data, &c)
 	if err != nil {
 		return nil, err
@@ -162,7 +162,7 @@ func listAllRequests(file string) error {
 	}
 
 	// Unmarshal the YAML data into a map of Endpoint structs
-	var c map[string]Endpoint
+	var c map[string]endpoint
 	err = yaml.Unmarshal(data, &c)
 	if err != nil {
 		return err

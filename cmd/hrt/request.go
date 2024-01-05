@@ -9,7 +9,7 @@ import (
 	"strings"
 )
 
-type Response struct {
+type reqResult struct {
 	ResponseHeaders http.Header
 	RequestHeaders  http.Header
 	ResponseBody    string
@@ -20,7 +20,7 @@ type Response struct {
 	URL             string
 }
 
-func createRequest(ep Endpoint) (*http.Request, error) {
+func createRequest(ep endpoint) (*http.Request, error) {
 	if ep.Method == "" {
 		ep.Method = "GET"
 	}
@@ -79,23 +79,23 @@ func handleResponse(resp *http.Response) (string, error) {
 	return string(body), nil
 }
 
-func runTest(test string, ep Endpoint, client *http.Client) (Response, error) {
+func runTest(test string, ep endpoint, client *http.Client) (reqResult, error) {
 	req, err := createRequest(ep)
 	if err != nil {
-		return Response{}, err
+		return reqResult{}, err
 	}
 
 	resp, err := sendRequest(client, req)
 	if err != nil {
-		return Response{}, err
+		return reqResult{}, err
 	}
 
 	body, err := handleResponse(resp)
 	if err != nil {
-		return Response{}, err
+		return reqResult{}, err
 	}
 
-	return Response{
+	return reqResult{
 		ResponseHeaders: resp.Header,
 		RequestHeaders:  req.Header,
 		ResponseBody:    body,

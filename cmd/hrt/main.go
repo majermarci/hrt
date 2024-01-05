@@ -27,7 +27,7 @@ var (
 	verbose      = flag.Bool("v", false, "Enable verbose Request details")
 	moreVerbose  = flag.Bool("vv", false, "Enable verbose Request and TLS details")
 	version      = flag.Bool("version", false, "Print the version")
-	allResponses []Response
+	allResponses []reqResult
 )
 
 const (
@@ -128,7 +128,7 @@ func main() {
 	}
 
 	// If the -a option is enabled, run all tests, else run the specified test
-	requests := make(map[string]Endpoint)
+	requests := make(map[string]endpoint)
 	if *runAll {
 		requests = conf
 	} else {
