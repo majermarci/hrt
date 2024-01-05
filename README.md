@@ -40,7 +40,7 @@ You can download the latest binary from the releases page.
 For Linux and macOS, you can use the following command:
 
 ```bash
-curl -L https://github.com/majermarci/hrt/releases/latest/download/hrt-linux-amd64) -o hrt
+curl -L https://github.com/majermarci/hrt/releases/latest/download/hrt-linux-amd64 -o hrt
 
 chmod +x hrt
 
