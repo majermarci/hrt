@@ -46,8 +46,8 @@ jobs:
         include:
           - platform: linux
             arch: amd64
-          - platform: darwin
-            arch: amd64
+          # - platform: darwin
+          #   arch: amd64
     steps:
     - uses: actions/checkout@v3
 
@@ -60,7 +60,7 @@ jobs:
       run: echo "BINARY_NAME=$(basename $(pwd))" >> $GITHUB_ENV
 
     - name: Build for ${{ matrix.platform }} ${{ matrix.arch }}
-      run: GOOS=${{ matrix.platform }} GOARCH=${{ matrix.arch }} go build -v -trimpaths -a -installsuffix cgo -o bin/${{ env.BINARY_NAME }}-${{ matrix.platform }}-${{ matrix.arch }} ./cmd/${{ env.BINARY_NAME }}
+      run: GOOS=${{ matrix.platform }} GOARCH=${{ matrix.arch }} go build -v -trimpath -a -installsuffix cgo -o bin/${{ env.BINARY_NAME }}-${{ matrix.platform }}-${{ matrix.arch }} ./cmd/${{ env.BINARY_NAME }}
 
     - name: Upload Artifacts
       uses: actions/upload-artifact@v2
