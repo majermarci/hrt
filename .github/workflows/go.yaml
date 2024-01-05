@@ -1,18 +1,19 @@
-name: Go
+name: Go CI/CD
 
 on:
-  # release:
-  #   types:
-  #     - created
   push:
-    branches: [release]
-  pull_request:
     branches: [main]
+    paths:
+      - 'cmd/**'
+      - 'go.mod'
+      - 'go.sum'
+  release:
+    types: [created]
 
 jobs:
-
   audit:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' || github.event_name == 'release'
     steps:
     - uses: actions/checkout@v3
 
@@ -24,50 +25,55 @@ jobs:
     - name: Verify dependencies
       run: go mod verify
 
-    - name: Build
-      run: go build -v ./...
-
     - name: Run go vet
       run: go vet ./...
 
-    - name: Install staticcheck
-      run: go install honnef.co/go/tools/cmd/staticcheck@latest
-
     - name: Run staticcheck
-      run: staticcheck ./...
-
-    - name: Install golint
-      run: go install golang.org/x/lint/golint@latest
+      run: go run honnef.co/go/tools/cmd/staticcheck@latest -checks=all ./...
 
     - name: Run golint
-      run: golint ./...
+      run: go run golang.org/x/lint/golint@latest ./...
 
     - name: Run tests
       run: go test -race -vet=off ./...
 
   build:
-    name: Build for Linux and Darwin
+    needs: audit
+    if: github.event_name == 'release'
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - platform: linux
+            arch: amd64
+          - platform: darwin
+            arch: amd64
     steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v3
+    - uses: actions/checkout@v3
 
-      - name: Set up Go
-        uses: actions/setup-go@v4
-        with:
-          go-version: '1.21'
+    - name: Set up Go
+      uses: actions/setup-go@v4
+      with:
+        go-version: '1.21'
 
-      - name: Build for Linux
-        run: GOOS=linux GOARCH=amd64 go build -v -o packages/myapp-linux-amd64 ./cmd/api
-        
-      - name: Build for Darwin
-        run: GOOS=darwin GOARCH=amd64 go build -o packages/myapp-darwin-amd64 ./cmd/api
+    - name: Extract binary name
+      run: echo "BINARY_NAME=$(basename $(pwd))" >> $GITHUB_ENV
 
-      - name: List Artifacts
-        run: ls -R packages/
+    - name: Build for ${{ matrix.platform }} ${{ matrix.arch }}
+      run: GOOS=${{ matrix.platform }} GOARCH=${{ matrix.arch }} go build -v -trimpaths -a -installsuffix cgo -o bin/${{ env.BINARY_NAME }}-${{ matrix.platform }}-${{ matrix.arch }} ./cmd/${{ env.BINARY_NAME }}
 
-      # - name: Upload Artifacts
-      #   uses: actions/upload-artifact@v2
-      #   with:
-      #     name: binaries
-      #     path: packages/
+    - name: Upload Artifacts
+      uses: actions/upload-artifact@v2
+      with:
+        name: binaries
+        path: bin/
+
+    - name: Upload Release Asset
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ github.event.release.upload_url }}
+        asset_path: ./bin/${{ env.BINARY_NAME }}-${{ matrix.platform }}-${{ matrix.arch }}
+        asset_name: ${{ env.BINARY_NAME }}-${{ matrix.platform }}-${{ matrix.arch }}
+        asset_content_type: application/octet-stream

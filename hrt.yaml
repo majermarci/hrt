@@ -1,20 +1,13 @@
-# Public test site, which will do a simple GET request
 example:
   url: https://example.com
 
-httpbin:
-  url: https://httpbin.org/
-  method: POST
-  body: |
-    {
-      "message": "Hello World!"
-    }
+json:
+  url: https://localhost:4000/echo/json
+  method: GET
+  body: '{"message": "Hello World!"}'
   basic_auth:
     username: admin
     password: admin
-  headers:
-    Content-Type: application/json
-    Test-Header: Test-Value
 
 echo:
   url: https://echo.free.beeceptor.com
@@ -27,43 +20,3 @@ echo:
   headers:
     Content-Type: application/json
     Test-Header: Test-Value
-
-# Mock endpoint for testing
-mock:
-  url: http://localhost:8081/mock
-  method: POST
-  headers:
-    Content-Type: application/json
-    Test-Header: Test-Value
-  body: '{"message": "Hello World!"}'
-  basic_auth:
-    username: admin
-    password: admin
-  # bearer_token: VGhpc0lzQVRlc3RUb2tlbgo=
-
-json:
-  url: https://localhost:4000/echo/json
-  method: GET
-  body: '{"message": "Hello World!"}'
-
-xml:
-  url: https://localhost:4000/echo/xml
-  method: POST
-  body:
-    <?xml version="1.0" encoding="UTF-8"?>
-    <soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope" xmlns:ns="http://example.com/namespace">
-        <soap:Header>
-            <ns:Authorization>
-                <Username>your_username</Username>
-                <Password>your_password</Password>
-            </ns:Authorization>
-        </soap:Header>
-        <soap:Body>
-            <ns:YourSOAPRequest>
-                <Parameter1>Value1</Parameter1>
-                <Parameter2>Value2</Parameter2>
-            </ns:YourSOAPRequest>
-        </soap:Body>
-    </soap:Envelope>
-  headers:
-    Content-Type: application/xml

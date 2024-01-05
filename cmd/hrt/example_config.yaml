@@ -1,26 +1,43 @@
-# Request's name that will be used when you run the command
+## Request's name that will be used when you run the command
 example:
   # URL of the request. Format: scheme://host:port/path
   # REQUIRED!
   url: http://localhost:8080
+
   # HTTP method of the request. Supported methods: GET, POST, PUT, PATCH, DELETE
   # Default: GET
-  method: GET
+  method: POST
+
   # Headers of the request.
   headers:
+    Content-Type: application/json
     X-Header-1: value1
-    X-Header-2: value2
+    # Add as many headers as you need...
+
   # Body of the request. Can be a string or empty.
   body: |
     {
       "key": "value"
     }
+
   # Basic auth credentials of the request.
   # You cannot use both basic auth and bearer token at the same time!
   basic_auth:
     username: username
     password: password
+
   # Optionally you can use bearer token instead of basic auth.
   bearer_token: your_token
 
-# Repeat the same structure for other requests.
+#### Repeat the same structure for other requests...
+
+### Example of a second request
+# development:
+#   url: http://endpoint.dev:8080
+#   method: PUT
+#   headers:
+#     Content-Type: application/json
+#   body: |
+#     {
+#       "key": "value"
+#     }

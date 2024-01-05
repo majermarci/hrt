@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"io"
 	"net/http"
-	"os"
 	"strings"
 )
 
@@ -21,7 +20,7 @@ type Response struct {
 	URL             string
 }
 
-func runTest(test string, ep Endpoint, client *http.Client) Response {
+func createRequest(ep Endpoint) (*http.Request, error) {
 	if ep.Method == "" {
 		ep.Method = "GET"
 	}
@@ -29,8 +28,7 @@ func runTest(test string, ep Endpoint, client *http.Client) Response {
 	// Perform an HTTP request for the endpoint
 	req, err := http.NewRequest(ep.Method, ep.URL, strings.NewReader(ep.Body))
 	if err != nil {
-		fmt.Printf("Failed to create request for endpoint %s: %v\n", test, err)
-		os.Exit(1)
+		return nil, fmt.Errorf("error creating request: %w", err)
 	}
 
 	// Add headers to the request
@@ -39,34 +37,36 @@ func runTest(test string, ep Endpoint, client *http.Client) Response {
 	}
 
 	// Check if both Basic Auth and Bearer Token are specified
-	if ep.BasicAuth.Username != "" && ep.BasicAuth.Password != "" && ep.BearerToken != "" {
-		fmt.Printf("Error: Both Basic Auth and Bearer Token are specified for endpoint %s.\nPlease select only one method of authentication.\n", test)
-		os.Exit(1)
+	if (ep.BasicAuth.Username != "" || ep.BasicAuth.Password != "") && ep.BearerToken != "" {
+		return nil, fmt.Errorf("both basic auth and bearer token are specified\nPlease select only one method of authentication")
 	}
 
 	// Add basic authentication to the request if specified
 	if ep.BasicAuth.Username != "" && ep.BasicAuth.Password != "" {
 		req.SetBasicAuth(ep.BasicAuth.Username, ep.BasicAuth.Password)
-	}
-
-	// Add bearer token to the request if specified
-	if ep.BearerToken != "" {
+	} else if ep.BearerToken != "" {
+		// Add bearer token to the request if specified
 		req.Header.Add("Authorization", "Bearer "+ep.BearerToken)
 	}
 
-	// Send the request using the client
+	return req, nil
+}
+
+func sendRequest(client *http.Client, req *http.Request) (*http.Response, error) {
 	resp, err := client.Do(req)
 	if err != nil {
-		fmt.Printf("Failed to send request for endpoint %s: %v\n", test, err)
-		os.Exit(1)
+		return nil, fmt.Errorf("error sending request - %w", err)
 	}
+	return resp, nil
+}
+
+func handleResponse(resp *http.Response) (string, error) {
 	defer resp.Body.Close()
 
 	// Read the response body
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		fmt.Printf("Failed to read response body for endpoint %s: %v", test, err)
-		os.Exit(1)
+		return "", fmt.Errorf("error reading response body: %w", err)
 	}
 
 	// Try to unmarshal the body into a JSON object
@@ -76,15 +76,33 @@ func runTest(test string, ep Endpoint, client *http.Client) Response {
 		body, _ = json.MarshalIndent(jsonObj, "", "  ")
 	}
 
-	// Return the response
+	return string(body), nil
+}
+
+func runTest(test string, ep Endpoint, client *http.Client) (Response, error) {
+	req, err := createRequest(ep)
+	if err != nil {
+		return Response{}, err
+	}
+
+	resp, err := sendRequest(client, req)
+	if err != nil {
+		return Response{}, err
+	}
+
+	body, err := handleResponse(resp)
+	if err != nil {
+		return Response{}, err
+	}
+
 	return Response{
 		ResponseHeaders: resp.Header,
 		RequestHeaders:  req.Header,
-		ResponseBody:    string(body),
+		ResponseBody:    body,
 		RequestName:     test,
 		StatusCode:      resp.Status,
 		TLSInfo:         resp.TLS,
 		Method:          ep.Method,
 		URL:             ep.URL,
-	}
+	}, nil
 }

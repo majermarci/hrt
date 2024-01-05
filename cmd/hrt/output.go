@@ -6,84 +6,88 @@ import (
 	"strings"
 )
 
-// Helper function to print responses
+func printTLSInfo(response Response) {
+	fmt.Printf("\nTLS details for endpoint '%s'\n", response.RequestName)
+	tlsVersion := map[uint16]string{
+		tls.VersionTLS10: "1.0",
+		tls.VersionTLS11: "1.1",
+		tls.VersionTLS12: "1.2",
+		tls.VersionTLS13: "1.3",
+	}
+	fmt.Printf("  TLS version: %s\n", tlsVersion[response.TLSInfo.Version])
+
+	tlsCipherSuite := map[uint16]string{
+		tls.TLS_AES_128_GCM_SHA256:                        "TLS_AES_128_GCM_SHA256",
+		tls.TLS_AES_256_GCM_SHA384:                        "TLS_AES_256_GCM_SHA384",
+		tls.TLS_CHACHA20_POLY1305_SHA256:                  "TLS_CHACHA20_POLY1305_SHA256",
+		tls.TLS_RSA_WITH_RC4_128_SHA:                      "TLS_RSA_WITH_RC4_128_SHA",
+		tls.TLS_RSA_WITH_3DES_EDE_CBC_SHA:                 "TLS_RSA_WITH_3DES_EDE_CBC_SHA",
+		tls.TLS_RSA_WITH_AES_128_CBC_SHA:                  "TLS_RSA_WITH_AES_128_CBC_SHA",
+		tls.TLS_RSA_WITH_AES_256_CBC_SHA:                  "TLS_RSA_WITH_AES_256_CBC_SHA",
+		tls.TLS_RSA_WITH_AES_128_CBC_SHA256:               "TLS_RSA_WITH_AES_128_CBC_SHA256",
+		tls.TLS_RSA_WITH_AES_128_GCM_SHA256:               "TLS_RSA_WITH_AES_128_GCM_SHA256",
+		tls.TLS_RSA_WITH_AES_256_GCM_SHA384:               "TLS_RSA_WITH_AES_256_GCM_SHA384",
+		tls.TLS_ECDHE_ECDSA_WITH_RC4_128_SHA:              "TLS_ECDHE_ECDSA_WITH_RC4_128_SHA",
+		tls.TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA:          "TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA",
+		tls.TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA:          "TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA",
+		tls.TLS_ECDHE_RSA_WITH_RC4_128_SHA:                "TLS_ECDHE_RSA_WITH_RC4_128_SHA",
+		tls.TLS_ECDHE_RSA_WITH_3DES_EDE_CBC_SHA:           "TLS_ECDHE_RSA_WITH_3DES_EDE_CBC_SHA",
+		tls.TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA:            "TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA",
+		tls.TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA:            "TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA",
+		tls.TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA256:       "TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA256",
+		tls.TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256:         "TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256",
+		tls.TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256:         "TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256",
+		tls.TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256:       "TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256",
+		tls.TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384:         "TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384",
+		tls.TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384:       "TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384",
+		tls.TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256:   "TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256",
+		tls.TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256: "TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256",
+	}
+
+	fmt.Printf("  Cipher suite: %s\n", tlsCipherSuite[response.TLSInfo.CipherSuite])
+	fmt.Printf("  Server name: %s\n", response.TLSInfo.ServerName)
+	if response.TLSInfo.PeerCertificates != nil && len(response.TLSInfo.PeerCertificates) > 0 {
+		fmt.Printf("  Peer certificate: %v\n", response.TLSInfo.PeerCertificates[0].Subject)
+		fmt.Printf("  Issuer: %v\n\n", response.TLSInfo.PeerCertificates[0].Issuer)
+	}
+}
+
+func printHeaders(headerType string, headers map[string][]string) {
+	fmt.Println(headerType + " Headers:")
+	for key, values := range headers {
+		for _, value := range values {
+			fmt.Printf("  %s: %s\n", key, value)
+		}
+	}
+}
+
+func printResponseBody(response Response) {
+	if response.ResponseBody != "" {
+		fmt.Println(response.ResponseBody)
+	}
+}
+
 func printResponses(responses []Response) {
 	for _, response := range responses {
-		// Print TLS details
 		if *moreVerbose && response.TLSInfo != nil {
-			fmt.Printf("TLS details for endpoint '%s'\n", response.RequestName)
-			tlsVersion := map[uint16]string{
-				tls.VersionTLS10: "1.0",
-				tls.VersionTLS11: "1.1",
-				tls.VersionTLS12: "1.2",
-				tls.VersionTLS13: "1.3",
-			}
-			fmt.Printf("  TLS version: %s\n", tlsVersion[response.TLSInfo.Version])
-
-			tlsCipherSuite := map[uint16]string{
-				tls.TLS_AES_128_GCM_SHA256:                        "TLS_AES_128_GCM_SHA256",
-				tls.TLS_AES_256_GCM_SHA384:                        "TLS_AES_256_GCM_SHA384",
-				tls.TLS_CHACHA20_POLY1305_SHA256:                  "TLS_CHACHA20_POLY1305_SHA256",
-				tls.TLS_RSA_WITH_RC4_128_SHA:                      "TLS_RSA_WITH_RC4_128_SHA",
-				tls.TLS_RSA_WITH_3DES_EDE_CBC_SHA:                 "TLS_RSA_WITH_3DES_EDE_CBC_SHA",
-				tls.TLS_RSA_WITH_AES_128_CBC_SHA:                  "TLS_RSA_WITH_AES_128_CBC_SHA",
-				tls.TLS_RSA_WITH_AES_256_CBC_SHA:                  "TLS_RSA_WITH_AES_256_CBC_SHA",
-				tls.TLS_RSA_WITH_AES_128_CBC_SHA256:               "TLS_RSA_WITH_AES_128_CBC_SHA256",
-				tls.TLS_RSA_WITH_AES_128_GCM_SHA256:               "TLS_RSA_WITH_AES_128_GCM_SHA256",
-				tls.TLS_RSA_WITH_AES_256_GCM_SHA384:               "TLS_RSA_WITH_AES_256_GCM_SHA384",
-				tls.TLS_ECDHE_ECDSA_WITH_RC4_128_SHA:              "TLS_ECDHE_ECDSA_WITH_RC4_128_SHA",
-				tls.TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA:          "TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA",
-				tls.TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA:          "TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA",
-				tls.TLS_ECDHE_RSA_WITH_RC4_128_SHA:                "TLS_ECDHE_RSA_WITH_RC4_128_SHA",
-				tls.TLS_ECDHE_RSA_WITH_3DES_EDE_CBC_SHA:           "TLS_ECDHE_RSA_WITH_3DES_EDE_CBC_SHA",
-				tls.TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA:            "TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA",
-				tls.TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA:            "TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA",
-				tls.TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA256:       "TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA256",
-				tls.TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256:         "TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256",
-				tls.TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256:         "TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256",
-				tls.TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256:       "TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256",
-				tls.TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384:         "TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384",
-				tls.TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384:       "TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384",
-				tls.TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256:   "TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256",
-				tls.TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256: "TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256",
-			}
-			fmt.Printf("  Cipher suite: %s\n", tlsCipherSuite[response.TLSInfo.CipherSuite])
-			fmt.Printf("  Server name: %s\n", response.TLSInfo.ServerName)
-			if response.TLSInfo.PeerCertificates != nil && len(response.TLSInfo.PeerCertificates) > 0 {
-				fmt.Printf("  Peer certificate: %v\n", response.TLSInfo.PeerCertificates[0].Subject)
-				fmt.Printf("  Issuer: %v\n\n", response.TLSInfo.PeerCertificates[0].Issuer)
-			}
+			printTLSInfo(response)
 		}
 
-		// Print all request headers if verbose is enabled
 		if *moreVerbose && len(response.RequestHeaders) > 0 {
-			fmt.Println("Request Headers:")
-			for key, values := range response.RequestHeaders {
-				for _, value := range values {
-					fmt.Printf("  %s: %s\n", key, value)
-				}
-			}
+			printHeaders("Request", response.RequestHeaders)
 		}
 
-		// Print response headers if verbose is enabled
 		if *moreVerbose && len(response.ResponseHeaders) > 0 {
-			fmt.Println("Response Headers:")
-			for key, values := range response.ResponseHeaders {
-				for _, value := range values {
-					fmt.Printf("  %s: %s\n", key, value)
-				}
-			}
+			printHeaders("Response", response.ResponseHeaders)
 		}
 
 		if *verbose || *moreVerbose {
-			fmt.Printf("Request: '%v' - %v %v\n", response.RequestName, response.Method, response.URL)
+			fmt.Printf("\nRequest: '%v' - %v %v\n", response.RequestName, response.Method, response.URL)
 			fmt.Printf("Status: %v\n", response.StatusCode)
 			fmt.Println("\nResponse Body:")
 		}
 
-		if response.ResponseBody != "" {
-			fmt.Println(response.ResponseBody)
-		}
+		printResponseBody(response)
 	}
 }
 

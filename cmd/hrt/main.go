@@ -19,6 +19,7 @@ var (
 	caCertFile   = flag.String("cacert", "", "Path to the CA certificate file")
 	requestName  = flag.String("r", "", "Request to run from config file")
 	timeout      = flag.Int("t", 30, "Timeout for the HTTP client in seconds")
+	listRequests = flag.Bool("l", false, "List all available requests in the current config file")
 	createGlobal = flag.Bool("g", false, "Create a global config file")
 	runAll       = flag.Bool("a", false, "Run all tests from config file")
 	insecure     = flag.Bool("k", false, "Disable certificate validation")
@@ -30,7 +31,7 @@ var (
 )
 
 const (
-	appVersion = "0.3.5"
+	appVersion = "0.4.1"
 )
 
 func main() {
@@ -58,7 +59,12 @@ func main() {
 	}
 
 	if *verbose || *moreVerbose {
-		fmt.Printf("Used config file: %s\n\n", *confFile)
+		fmt.Printf("Used config file: %s\n", *confFile)
+	}
+
+	if *listRequests {
+		listAllRequests(*confFile)
+		os.Exit(0)
 	}
 
 	// Load system CA pool
@@ -84,78 +90,70 @@ func main() {
 		}
 	}
 
-	// Create an HTTP client
-	var client *http.Client
-	if *insecure {
-		client = &http.Client{
-			Timeout: time.Duration(*timeout) * time.Second,
-			Transport: &http.Transport{
-				TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
-			},
-		}
-	} else if *certFile != "" && *keyFile != "" {
+	// Create a base transport with common settings
+	transport := &http.Transport{
+		TLSClientConfig: &tls.Config{
+			InsecureSkipVerify: *insecure,
+			RootCAs:            caCertPool,
+		},
+	}
+
+	// Load certificate if certFile and keyFile are provided
+	if *certFile != "" && *keyFile != "" {
 		cert, err := tls.LoadX509KeyPair(*certFile, *keyFile)
 		if err != nil {
 			fmt.Printf("Failed to load key pair: %v", err)
 			os.Exit(1)
 		}
-
-		client = &http.Client{
-			Timeout: time.Duration(*timeout) * time.Second,
-			Transport: &http.Transport{
-				TLSClientConfig: &tls.Config{
-					Certificates: []tls.Certificate{cert},
-					RootCAs:      caCertPool,
-				},
-			},
-		}
-	} else {
-		client = &http.Client{
-			Timeout: time.Duration(*timeout) * time.Second,
-			Transport: &http.Transport{
-				TLSClientConfig: &tls.Config{
-					RootCAs: caCertPool,
-				},
-			},
-		}
+		transport.TLSClientConfig.Certificates = []tls.Certificate{cert}
 	}
 
-	// If the -a option is enabled, run all tests
+	// Create an HTTP client with the configured transport
+	client := &http.Client{
+		Timeout:   time.Duration(*timeout) * time.Second,
+		Transport: transport,
+	}
+
+	// Check if a request name is provided when -a option is enabled
+	if *runAll && *requestName != "" {
+		fmt.Println("Cannot use -a option with a specific request")
+		os.Exit(1)
+	}
+
+	// Check if a request name is not provided when -a option is disabled
+	if !*runAll && *requestName == "" {
+		fmt.Println("Please specify a request to run using the '-r' flag")
+		fmt.Println("Check the '-h' flag for additional help.")
+		os.Exit(1)
+	}
+
+	// If the -a option is enabled, run all tests, else run the specified test
+	requests := make(map[string]Endpoint)
 	if *runAll {
-		if *requestName != "" {
-			fmt.Println("Cannot use -a option with a specific request")
-			os.Exit(1)
-		}
-
-		for requestName, endpoint := range conf {
-			response := runTest(requestName, endpoint, client)
-			allResponses = append(allResponses, response)
-		}
-		if *tableOutput {
-			printTable(allResponses)
-		} else {
-			printResponses(allResponses)
-		}
+		requests = conf
 	} else {
-		if *requestName == "" {
-			fmt.Println("Please specify a request to run using the '-r' flag")
-			fmt.Println("Check the '-h' flag for additional help.")
-			os.Exit(1)
-		}
-
-		// Find the endpoint for the specified request
 		endpoint, ok := conf[*requestName]
 		if !ok {
 			fmt.Printf("No endpoint found for request '%s'\n", *requestName)
 			os.Exit(1)
 		}
+		requests[*requestName] = endpoint
+	}
 
-		response := runTest(*requestName, endpoint, client)
-		allResponses = append(allResponses, response)
-		if *tableOutput {
-			printTable(allResponses)
-		} else {
-			printResponses(allResponses)
+	// Run tests for all requests and collect responses
+	for requestName, endpoint := range requests {
+		response, err := runTest(requestName, endpoint, client)
+		if err != nil {
+			fmt.Printf("Failed to run test '%s': %v\n", requestName, err)
+			os.Exit(1)
 		}
+		allResponses = append(allResponses, response)
+	}
+
+	// Print responses
+	if *tableOutput {
+		printTable(allResponses)
+	} else {
+		printResponses(allResponses)
 	}
 }
