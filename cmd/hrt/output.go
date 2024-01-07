@@ -63,6 +63,7 @@ func printHeaders(headerType string, headers map[string][]string) {
 
 func printResponseBody(response reqResult) {
 	if response.ResponseBody != "" {
+		fmt.Println("\nResponse Body:")
 		fmt.Println(response.ResponseBody)
 	}
 }
@@ -77,14 +78,14 @@ func printResponses(responses []reqResult) {
 			printHeaders("Request", response.RequestHeaders)
 		}
 
-		if *moreVerbose && len(response.ResponseHeaders) > 0 {
+		// If the method is HEAD or moreVerbose is true, print the response headers
+		if (response.Method == "HEAD" || response.Method == "OPTIONS") || (*moreVerbose && len(response.ResponseHeaders) > 0) {
 			printHeaders("Response", response.ResponseHeaders)
 		}
 
 		if *verbose || *moreVerbose {
 			fmt.Printf("\nRequest: '%v' - %v %v\n", response.RequestName, response.Method, response.URL)
 			fmt.Printf("Status: %v\n", response.StatusCode)
-			fmt.Println("\nResponse Body:")
 		}
 
 		printResponseBody(response)

@@ -2,7 +2,10 @@
 
 [![Go Report Card](https://goreportcard.com/badge/github.com/majermarci/hrt)](https://goreportcard.com/report/github.com/majermarci/hrt)
 [![Go Reference](https://pkg.go.dev/badge/github.com/majermarci/hrt.svg)](https://pkg.go.dev/github.com/majermarci/hrt)
-![Latest release](https://img.shields.io/github/v/release/majermarci/hrt)
+![License](https://img.shields.io/github/license/majermarci/hrt?label=License)
+[![Build Status](https://github.com/majermarci/hrt/actions/workflows/build.yaml/badge.svg)](https://github.com/majermarci/hrt/actions/workflows/build.yaml)
+![Latest Pre-Release)](https://img.shields.io/github/v/release/majermarci/hrt?include_prereleases&label=pre-release&logo=github)
+<!-- ![Latest Release)](https://img.shields.io/github/v/release/majermarci/hrt?logo=github) -->
 
 The app is still in early development (and it is a learning project for me), but the idea is to have a simple CLI alternative to Insomnia / httpie and similar tools.
 `hrt` works with a simple and easy-to-back-up `yaml` configuration, which can also be customized per project and included in repos.
@@ -51,7 +54,7 @@ sudo install -m 755 hrt /usr/local/bin
 
 Requirements:
 
-- Go 1.21.5+
+- Go 1.21+
 - GNU Make
 
 ```bash
@@ -62,22 +65,3 @@ make build
 
 sudo install -m 755 bin/hrt /usr/local/bin
 ```
-
-## To-Do / Plans
-
-- ~~Make response outputs nicer and more readable~~
-- ~~Hide response body if none is given back~~
-- ~~Add timeout options for each request~~
-- ~~Add option to list / hide response headers~~
-- ~~Create show details option for specific request~~
-- ~~Add basic and bearer token auth options~~
-- ~~Add option to call with specific certificate~~
-- ~~Make an example config output, and offer to create it~~
-- ~~Default config search in `$HOME/.config/hrt/config.yaml`, but prioritize local config~~
-- ~~Add option to list all available requests~~
-- Add OAuth2 auth option
-- Better support for HEAD and OPTIONS methods
-- ~~Add version variable to the build process along with commit ID~~
-- Autocomplete the request names from default config
-- Interactive TUI with dynamic output and selection (?)
-- Add tests...

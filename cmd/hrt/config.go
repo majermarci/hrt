@@ -52,7 +52,7 @@ func checkConfigExists(confFile string) bool {
 
 func createGlobalConfigFile(globalConfFile string) error {
 	if checkConfigExists(globalConfFile) {
-		return fmt.Errorf("global config file already exists at %s", globalConfFile)
+		return fmt.Errorf("file already exists at %s", globalConfFile)
 	}
 
 	err := os.MkdirAll(filepath.Dir(globalConfFile), 0700)
@@ -131,9 +131,7 @@ func loadConfig(file string) (map[string]endpoint, error) {
 			fmt.Println("\nNo config file created. Check '-h' for options")
 			os.Exit(0)
 		} else {
-			// return nil, fmt.Errorf("Invalid response!")
-			fmt.Println("\nInvalid response!")
-			os.Exit(1)
+			return nil, fmt.Errorf("invalid response")
 		}
 	}
 

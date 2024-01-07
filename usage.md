@@ -19,14 +19,17 @@ The configuration file uses the YAML format and supports the following fields wh
 
 - `endpoint`: The endpoint name to send the request to. Repeating field that can be used multiple times.
 - `endpoint.url`: The URL of the request. Format: `scheme://host:port/path?query#fragment`
-- `endpoint.method`: The HTTP method for the request. Default is `GET`. Supported methods are `GET`, `POST`, `PUT`, `PATCH` and `DELETE`. `HEAD` and `OPTIONS` will work but only show info with high verbosity (`-vv`).
+- `endpoint.method`: The HTTP method for the request. Default is `GET`. Supported methods are `GET`, `POST`, `PUT`, `PATCH` and `DELETE`. `HEAD` and `OPTIONS` work too, and will display response headers by default.
 - `endpoint.headers`: The headers for the request. It can contain as many key-value pairs as you want.
 - `endpoint.body`: The body of the request.
 - `endpoint.basic_auth.username`: The username for basic authentication.
 - `endpoint.basic_auth.password`: The password for basic authentication.
-- `endpoint.bearer_token`: The bearer token for the request. Cannot be specified together with basic auth.
+- `endpoint.bearer_token`: The bearer token for the request.
 
-#### Example configuration
+### Example configuration
+
+All options are represented below, but the only mandatory field is `url`.
+Please note that the two authentication options cannot be used together like in this example.
 
 ```yaml
 <request_name>:

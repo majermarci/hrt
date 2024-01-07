@@ -1,0 +1,36 @@
+name: Tests
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'cmd/**'
+      - 'go.mod'
+      - 'go.sum'
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    # if: github.event_name == 'push' || github.event_name == 'release'
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Set up Go
+      uses: actions/setup-go@v4
+      with:
+        go-version: 1.21
+
+    - name: Verify dependencies
+      run: go mod verify
+
+    - name: Run go vet
+      run: go vet ./...
+
+    - name: Run staticcheck
+      run: go run honnef.co/go/tools/cmd/staticcheck@latest -checks=all ./...
+
+    - name: Run golint
+      run: go run golang.org/x/lint/golint@latest ./...
+
+    - name: Run tests
+      run: go test -race -vet=off ./...

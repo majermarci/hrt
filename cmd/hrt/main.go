@@ -32,7 +32,7 @@ var (
 )
 
 const (
-	appVersion = "v0.4.2"
+	appVersion = "v0.5.0"
 )
 
 func main() {
