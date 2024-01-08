@@ -32,7 +32,7 @@ jobs:
         echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
 
     - name: Build for ${{ matrix.platform }} ${{ matrix.arch }}
-      run: GOOS=${{ matrix.platform }} GOARCH=${{ matrix.arch }} go build -trimpath -a -ldflags "-s -w -X main.commitID=$(git rev-parse --short HEAD) -X main.version=${{ env.VERSION }}" -installsuffix cgo -o bin/${{ env.BINARY_NAME }}-${{ matrix.platform }}-${{ matrix.arch }} ./cmd/${{ env.BINARY_NAME }}
+      run: GOOS=${{ matrix.platform }} GOARCH=${{ matrix.arch }} go build -trimpath -a -ldflags "-s -w -X main.commitID=$(git rev-parse --short HEAD) -X main.appVersion=${{ env.VERSION }}" -installsuffix cgo -o bin/${{ env.BINARY_NAME }}-${{ matrix.platform }}-${{ matrix.arch }} ./cmd/${{ env.BINARY_NAME }}
 
     - name: Upload Artifacts
       uses: actions/upload-artifact@v2
