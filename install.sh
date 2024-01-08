@@ -28,7 +28,7 @@ else
 fi
 
 # Download the file and check if it's successful
-if ! curl -L "$download_url" -o /usr/local/bin/hrt; then
+if ! curl -fsSL "$download_url" -o /usr/local/bin/hrt; then
     echo "Failed to download file"
     exit 1
 fi

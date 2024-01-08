@@ -4,8 +4,8 @@
 [![Go Reference](https://pkg.go.dev/badge/github.com/majermarci/hrt.svg)](https://pkg.go.dev/github.com/majermarci/hrt)
 ![License](https://img.shields.io/github/license/majermarci/hrt?label=License)
 [![Build Status](https://github.com/majermarci/hrt/actions/workflows/build.yaml/badge.svg)](https://github.com/majermarci/hrt/actions/workflows/build.yaml)
-![Latest Pre-Release)](https://img.shields.io/github/v/release/majermarci/hrt?include_prereleases&label=pre-release&logo=github)
-<!-- ![Latest Release)](https://img.shields.io/github/v/release/majermarci/hrt?logo=github) -->
+<!-- ![Latest Pre-Release)](https://img.shields.io/github/v/release/majermarci/hrt?include_prereleases&label=pre-release&logo=github) -->
+![Latest Release)](https://img.shields.io/github/v/release/majermarci/hrt?logo=github)
 
 The application is currently in its initial development stages and serves as a learning project. The ultimate goal is to provide a streamlined command-line interface alternative to tools such as Insomnia and httpie.
 The application works with a simple and easy-to-back-up `yaml` configuration, which can also be customized per project and included in repos.
