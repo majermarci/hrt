@@ -7,12 +7,12 @@
 ![Latest Pre-Release)](https://img.shields.io/github/v/release/majermarci/hrt?include_prereleases&label=pre-release&logo=github)
 <!-- ![Latest Release)](https://img.shields.io/github/v/release/majermarci/hrt?logo=github) -->
 
-The app is still in early development (and it is a learning project for me), but the idea is to have a simple CLI alternative to Insomnia / httpie and similar tools.
-`hrt` works with a simple and easy-to-back-up `yaml` configuration, which can also be customized per project and included in repos.
+The application is currently in its initial development stages and serves as a learning project. The ultimate goal is to provide a streamlined command-line interface alternative to tools such as Insomnia and httpie.
+The application works with a simple and easy-to-back-up `yaml` configuration, which can also be customized per project and included in repos.
 
 ## Features
 
-- Simple yaml configuration for organizing your request collection(s)
+- Simple [yaml configuration](cmd/hrt/example_config.yaml) for organizing your request collection(s)
   - Specify headers, body and method for each request
   - Bearer Token and Basic Auth support
   - Support for local and global config files
@@ -21,15 +21,15 @@ The app is still in early development (and it is a learning project for me), but
   - Usage of specific TLS certificate, adding new CA chains to existing one or skipping certificate verification
   - Global timeout option
   - Verbose outputs showing request and TLS details
-  - Option to run every request in currently used collection file
+  - Option to run every request from the active collection file right after each other
 
 ## Usage
 
-For usage information, run `hrt -h` or read about options at the [documentation](usage.md) page.
+For more information on how to use `hrt`, you can run `hrt -h` in your terminal or refer to the [documentation](usage.md) page.
 
 ## Installing
 
-If you have Go installed, you can install the app with the following command:
+If [Go](https://github.com/golang/go) is [installed](https://go.dev/doc/install) on your system, you can install the app using the following command:
 
 ```bash
 go install github.com/majermarci/hrt/cmd/hrt@latest
@@ -39,7 +39,7 @@ Tip: Make sure that your `$PATH` contains the Go bin directory (`$HOME/go/bin` b
 
 ### Downloading the binary
 
-You can download the latest binary from the releases page.
+You can download the latest binary from the [releases page](https://github.com/majermarci/hrt/releases).
 For Linux and macOS, you can use the following command:
 
 ```bash

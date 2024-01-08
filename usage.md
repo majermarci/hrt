@@ -48,13 +48,13 @@ Please note that the two authentication options cannot be used together like in 
 
 HRT supports the following command line flags:
 
-- `-r`: The name of the request you want to run form currently used configuration file.
-- `-l`: List all available requests in the currently used configuration file.
+- `-r`: The name of the request you want to run from currently used configuration file.
+- `-l`: Lists all available requests from the currently active configuration file.
 - `-c`: Use a custom configuration file instead of the default / global one.
 - `-a`: Run every request in the currently used configuration file.
 - `-g`: Create global configuration file with default example values.
 - `-t`: Timeout for the request in seconds. Default is 10 seconds.
-- `-table`: Show response in table format. Warning: This is an experimental feature. It will be ugly with large responses.
+- `-table`: Show response in table format. Warning: This is an experimental feature. This may not display well with large responses.
 - `-k`: Skip TLS certificate verification. (Insecure)
 - `-cacert`: Path to CA certificate file. Content is added to the system certificate pool.
 - `-cert`: Path to TLS certificate file.
