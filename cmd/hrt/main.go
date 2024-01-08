@@ -28,11 +28,8 @@ var (
 	moreVerbose  = flag.Bool("vv", false, "Enable verbose Request and TLS details")
 	version      = flag.Bool("version", false, "Print the version")
 	allResponses []reqResult
+	appVersion   string
 	commitID     string
-)
-
-const (
-	appVersion = "v0.5.0"
 )
 
 func main() {
@@ -40,14 +37,17 @@ func main() {
 
 	// If the -version flag is provided and no other flags are provided, print the version and exit
 	if *version && flag.NFlag() == 1 {
-		if commitID != "" {
+		if appVersion != "" && commitID != "" {
 			fmt.Printf("%s, commit %s\n", appVersion, commitID)
-		} else {
+		} else if appVersion != "" {
 			fmt.Println(appVersion)
+		} else if commitID != "" {
+			fmt.Printf("commit %s\n", commitID)
+		} else {
+			fmt.Println("Binary was built locally with no version provided")
 		}
 		os.Exit(0)
 	}
-
 	// // If no flags are specified, print out the available flags
 	// if flag.NFlag() == 0 {
 	// 	fmt.Println("Available flags:")

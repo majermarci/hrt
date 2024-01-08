@@ -37,10 +37,10 @@ go install github.com/majermarci/hrt/cmd/hrt@latest
 
 Tip: Make sure that your `$PATH` contains the Go bin directory (`$HOME/go/bin` by default).
 
-### Downloading the binary
+### Downloading the binary for Linux
 
 You can download the latest binary from the [releases page](https://github.com/majermarci/hrt/releases).
-For Linux and macOS, you can use the following command:
+For Linux x86_64 systems you can use the following command:
 
 ```bash
 curl -L https://github.com/majermarci/hrt/releases/latest/download/hrt-linux-amd64 -o hrt
@@ -50,7 +50,13 @@ chmod +x hrt
 sudo install -m 755 hrt /usr/local/bin
 ```
 
-### Build and install locally
+Alternatively here's a one-liner install script:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/majermarci/hrt/main/install.sh | sudo bash
+```
+
+### Building locally from source
 
 Requirements:
 
