@@ -7,8 +7,11 @@
 ![Latest Release)](https://img.shields.io/github/v/release/majermarci/hrt?logo=github)
 <!-- ![Latest Pre-Release)](https://img.shields.io/github/v/release/majermarci/hrt?include_prereleases&label=pre-release&logo=github) -->
 
-The application is currently in its initial development stages and serves as a learning project. The ultimate goal is to provide a streamlined command-line interface alternative to tools such as Insomnia and httpie.
-The application works with a simple and easy-to-back-up `yaml` configuration, which can also be customized per project and included in repos.
+`hrt` is a CLI http client, that uses `yaml` configs to manage your request collections.
+It's aim is to make testing easier, with having a config per project/repository containing the needed requests.
+
+My goal is to provide a simplified alternative to tools such as Insomnia and httpie.
+This tool is still in its development stage and serves as a learning project for me.
 
 ## Features
 
