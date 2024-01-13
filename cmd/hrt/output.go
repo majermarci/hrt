@@ -4,6 +4,8 @@ import (
 	"crypto/tls"
 	"fmt"
 	"strings"
+
+	"golang.org/x/term"
 )
 
 func printTLSInfo(response reqResult) {
@@ -63,7 +65,6 @@ func printHeaders(headerType string, headers map[string][]string) {
 
 func printResponseBody(response reqResult) {
 	if response.ResponseBody != "" {
-		fmt.Println("\nResponse Body:")
 		fmt.Println(response.ResponseBody)
 	}
 }
@@ -86,6 +87,7 @@ func printResponses(responses []reqResult) {
 		if *verbose || *moreVerbose {
 			fmt.Printf("\nRequest: '%v' - %v %v\n", response.RequestName, response.Method, response.URL)
 			fmt.Printf("Status: %v\n", response.StatusCode)
+			fmt.Println("\nResponse Body:")
 		}
 
 		printResponseBody(response)
@@ -93,6 +95,18 @@ func printResponses(responses []reqResult) {
 }
 
 func printTable(responses []reqResult) {
+	// Get the current terminal size
+	termWidth, _, err := term.GetSize(0)
+	if err != nil {
+		// If there's an error, default to a reasonable terminal width
+		termWidth = 80
+	}
+
+	// Define the maximum width for each column
+	maxTestWidth := 25
+	maxStatusWidth := 35
+	// maxBodyWidth := 60
+
 	// Determine the width of each column
 	testWidth := len("Request")
 	statusWidth := len("Status Code")
@@ -114,6 +128,14 @@ func printTable(responses []reqResult) {
 		}
 	}
 
+	// Calculate the maximum width for the body column
+	maxBodyWidth := termWidth - testWidth - statusWidth - 10
+
+	// Limit the width of each column to the maximum width
+	testWidth = min(testWidth, maxTestWidth)
+	statusWidth = min(statusWidth, maxStatusWidth)
+	bodyWidth = min(bodyWidth, maxBodyWidth)
+
 	// Print the table header
 	printLine(testWidth, statusWidth, bodyWidth, "╭", "┬", "╮")
 	fmt.Printf("│ %-*s │ %-*s │ %-*s │\n", testWidth, "Request", statusWidth, "Status Code", bodyWidth, "Response Body")
@@ -123,8 +145,10 @@ func printTable(responses []reqResult) {
 	for i, response := range responses {
 		lines := strings.Split(response.ResponseBody, "\n")
 		for j, line := range lines {
+			// Truncate the line if it's too long
+			line = truncate(line, maxBodyWidth)
 			if j == 0 {
-				fmt.Printf("│ %-*s │ %-*s │ %-*s │\n", testWidth, response.RequestName, statusWidth, response.StatusCode, bodyWidth, line)
+				fmt.Printf("│ %-*s │ %-*s │ %-*s │\n", testWidth, truncate(response.RequestName, maxTestWidth), statusWidth, truncate(response.StatusCode, maxStatusWidth), bodyWidth, line)
 			} else {
 				fmt.Printf("│ %-*s │ %-*s │ %-*s │\n", testWidth, "", statusWidth, "", bodyWidth, line)
 			}
@@ -147,4 +171,18 @@ func printLine(testWidth, statusWidth, bodyWidth int, start, middle, end string)
 	fmt.Print(middle)
 	fmt.Print(strings.Repeat("─", bodyWidth+2))
 	fmt.Println(end)
+}
+
+func min(a, b int) int {
+	if a < b {
+		return a
+	}
+	return b
+}
+
+func truncate(s string, maxLen int) string {
+	if len(s) > maxLen {
+		return s[:maxLen-3] + "..."
+	}
+	return s
 }

@@ -61,7 +61,7 @@ func TestPrintResponseBody(t *testing.T) {
 	output := captureOutput(func() { printResponseBody(response) })
 
 	// Check that the output is as expected
-	expected := "\nResponse Body:\nAll Good!\n"
+	expected := "All Good!\n"
 
 	equalsTo(t, output, expected)
 }
