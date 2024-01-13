@@ -4,6 +4,7 @@
 [![Go Reference](https://pkg.go.dev/badge/github.com/majermarci/hrt.svg)](https://pkg.go.dev/github.com/majermarci/hrt)
 ![License](https://img.shields.io/github/license/majermarci/hrt?label=License)
 [![Build Status](https://github.com/majermarci/hrt/actions/workflows/build.yaml/badge.svg)](https://github.com/majermarci/hrt/actions/workflows/build.yaml)
+[![Test Status](https://github.com/majermarci/hrt/actions/workflows/audit.yaml/badge.svg)](https://github.com/majermarci/hrt/actions/workflows/audit.yaml)
 ![Latest Release)](https://img.shields.io/github/v/release/majermarci/hrt?logo=github)
 <!-- ![Latest Pre-Release)](https://img.shields.io/github/v/release/majermarci/hrt?include_prereleases&label=pre-release&logo=github) -->
 
@@ -30,20 +31,24 @@ This tool is still in its development stage and serves as a learning project for
 
 For more information on how to use `hrt`, you can run `hrt -h` in your terminal or refer to the [documentation](usage.md) page.
 
-## Installing
+## Installation
 
-If [Go](https://github.com/golang/go) is [installed](https://go.dev/doc/install) on your system, you can install the app using the following command:
+- [Using the binary (Linux)](#using-the-binary-linux)
+- [Using Go](#using-go)
+- [Building from source](#building-from-source)
+
+---
+
+### Using the binary (Linux)
+
+You can use the one-line installer script to download and install the latest binary for Linux:
 
 ```bash
-go install github.com/majermarci/hrt/cmd/hrt@latest
+curl -fsSL https://raw.githubusercontent.com/majermarci/hrt/main/install.sh | sudo bash
 ```
 
-Tip: Make sure that your `$PATH` contains the Go bin directory (`$HOME/go/bin` by default).
-
-### Downloading the binary for Linux
-
-You can download the latest binary from the [releases page](https://github.com/majermarci/hrt/releases).
-For Linux x86_64 systems you can use the following command:
+Or you can download the latest binary from the [releases page](https://github.com/majermarci/hrt/releases) and install manually.
+This is only supported for Linux systems. For an x86_64 OS you can use the following commands:
 
 ```bash
 curl -L https://github.com/majermarci/hrt/releases/latest/download/hrt-linux-amd64 -o hrt
@@ -53,13 +58,21 @@ chmod +x hrt
 sudo install -m 755 hrt /usr/local/bin
 ```
 
-Alternatively here's a one-liner install script:
+---
+
+### Using Go
+
+If [Go](https://github.com/golang/go) is [installed](https://go.dev/doc/install) on your system, you can install the app using the following command:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/majermarci/hrt/main/install.sh | sudo bash
+go install github.com/majermarci/hrt/cmd/hrt@latest
 ```
 
-### Building locally from source
+Tip: Make sure that your `$PATH` contains the Go bin directory (`$HOME/go/bin` by default).
+
+---
+
+### Building from source
 
 Requirements:
 

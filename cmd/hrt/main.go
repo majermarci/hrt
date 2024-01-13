@@ -136,6 +136,7 @@ func main() {
 	requests := make(map[string]endpoint)
 	if *runAll {
 		requests = conf
+		*verbose = true
 	} else {
 		endpoint, ok := conf[*requestName]
 		if !ok {
