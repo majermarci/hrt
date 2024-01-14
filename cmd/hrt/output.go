@@ -3,6 +3,7 @@ package main
 import (
 	"crypto/tls"
 	"fmt"
+	"os"
 	"strings"
 
 	"golang.org/x/term"
@@ -128,8 +129,12 @@ func printTable(responses []reqResult) {
 		}
 	}
 
-	// Calculate the maximum width for the body column
+	// Calculate the maximum width of the body column
 	maxBodyWidth := termWidth - testWidth - statusWidth - 10
+	if maxBodyWidth <= 0 {
+		fmt.Println("Error: Terminal is too small for table output.\nPlease increase the width of your terminal.")
+		os.Exit(1)
+	}
 
 	// Limit the width of each column to the maximum width
 	testWidth = min(testWidth, maxTestWidth)
@@ -181,6 +186,15 @@ func min(a, b int) int {
 }
 
 func truncate(s string, maxLen int) string {
+	if maxLen < 3 {
+		if len(s) > maxLen {
+			return s[:maxLen]
+		}
+		return s
+	}
+	if len(s) < maxLen {
+		return s
+	}
 	if len(s) > maxLen {
 		return s[:maxLen-3] + "..."
 	}
