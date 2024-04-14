@@ -9,6 +9,9 @@ jobs:
     # needs: audit
     if: github.event_name == 'release'
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
     strategy:
       matrix:
         include:
@@ -18,13 +21,14 @@ jobs:
             arch: arm64
           # - platform: darwin
           #   arch: arm64
+
     steps:
     - uses: actions/checkout@v4
 
     - name: Set up Go
       uses: actions/setup-go@v4
       with:
-        go-version: 1.21
+        go-version: 1.21.5
 
     - name: Extract binary name and version
       run: |
@@ -43,7 +47,7 @@ jobs:
     - name: Upload Release Asset
       uses: actions/upload-release-asset@v1
       env:
-        GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ github.event.release.upload_url }}
         asset_path: ./bin/${{ env.BINARY_NAME }}-${{ matrix.platform }}-${{ matrix.arch }}
