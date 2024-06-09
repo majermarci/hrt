@@ -31,9 +31,11 @@ func createRequest(ep endpoint) (*http.Request, error) {
 		return nil, fmt.Errorf("error creating request: %w", err)
 	}
 
+	req.Header.Set("User-Agent", "hrt/v0.6")
+
 	// Add headers to the request
 	for key, value := range ep.Headers {
-		req.Header.Add(key, value)
+		req.Header.Set(key, value)
 	}
 
 	// Check if both Basic Auth and Bearer Token are specified
