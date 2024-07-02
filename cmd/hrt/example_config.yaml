@@ -1,10 +1,12 @@
+---
 ## Request's name that will be used when you run the command
 example:
   # URL of the request. Format: scheme://host:port/path
   # REQUIRED!
   url: http://localhost:8080
 
-  # HTTP method of the request. Supported methods: GET, POST, PUT, PATCH, DELETE, HEAD, OPTIONS
+  # HTTP method of the request.
+  # Supported methods: GET, POST, PUT, PATCH, DELETE, HEAD, OPTIONS
   # Default: GET
   method: POST
 
@@ -14,7 +16,8 @@ example:
     X-Header-1: value1
     # Add as many headers as you need...
 
-  # Body of the request. Can be a string or empty. You can even use YAML multiline string.
+  # Body of the request. Can be a string or empty.
+  # You can even use YAML multiline string.
   body: |
     {
       "key": "value"
