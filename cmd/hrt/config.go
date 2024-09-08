@@ -114,6 +114,11 @@ func checkConfig(confFile *string, createGlobal *bool) {
 }
 
 func loadConfig(file string) (map[string]endpoint, error) {
+
+	if *verbose || *moreVerbose {
+		fmt.Printf("Used config file: %s\n", *confFile)
+	}
+
 	if !checkConfigExists(file) {
 		response, err := getUserInput(fmt.Sprintf("Config file '%v' does not exist.\nDo you want to create it? (Y/n): ", file))
 		if err != nil {
@@ -149,27 +154,27 @@ func loadConfig(file string) (map[string]endpoint, error) {
 	return c, nil
 }
 
-func listAllRequests(file string) error {
+func listAllRequests(file string) ([]string, error) {
 	if !checkConfigExists(file) {
-		return fmt.Errorf("config file '%v' does not exist", file)
+		return nil, fmt.Errorf("config file '%v' does not exist", file)
 	}
 
 	data, err := os.ReadFile(file)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	// Unmarshal the YAML data into a map of Endpoint structs
 	var c map[string]endpoint
 	err = yaml.Unmarshal(data, &c)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	// Print all available requests
+	var requests []string
+
 	for request := range c {
-		fmt.Println(request)
+		requests = append(requests, request)
 	}
 
-	return nil
+	return requests, nil
 }

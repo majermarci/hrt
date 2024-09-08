@@ -49,7 +49,7 @@ func printTLSInfo(response reqResult) {
 
 	fmt.Printf("  Cipher suite: %s\n", tlsCipherSuite[response.TLSInfo.CipherSuite])
 	fmt.Printf("  Server name: %s\n", response.TLSInfo.ServerName)
-	if response.TLSInfo.PeerCertificates != nil && len(response.TLSInfo.PeerCertificates) > 0 {
+	if len(response.TLSInfo.PeerCertificates) > 0 {
 		fmt.Printf("  Peer certificate: %v\n", response.TLSInfo.PeerCertificates[0].Subject)
 		fmt.Printf("  Issuer: %v\n\n", response.TLSInfo.PeerCertificates[0].Issuer)
 	}

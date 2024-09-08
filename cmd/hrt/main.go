@@ -9,6 +9,8 @@ import (
 	"os"
 	"path/filepath"
 	"time"
+
+	tea "github.com/charmbracelet/bubbletea"
 )
 
 var (
@@ -63,12 +65,15 @@ func main() {
 		os.Exit(1)
 	}
 
-	if *verbose || *moreVerbose {
-		fmt.Printf("Used config file: %s\n", *confFile)
-	}
-
 	if *listRequests {
-		listAllRequests(*confFile)
+		r, e := listAllRequests(*confFile)
+		if e != nil {
+			fmt.Printf("Failed to list requests: %v\n", err)
+		}
+
+		for _, request := range r {
+			fmt.Println(request)
+		}
 		os.Exit(0)
 	}
 
@@ -127,9 +132,15 @@ func main() {
 
 	// Check if a request name is not provided when -a option is disabled
 	if !*runAll && *requestName == "" {
-		fmt.Println("Please specify a request to run using the '-r' flag")
-		fmt.Println("Check the '-h' flag for additional help.")
-		os.Exit(1)
+		p := tea.NewProgram(initialModel(), tea.WithAltScreen())
+		if _, err := p.Run(); err != nil {
+			fmt.Printf("there's been an error: %v", err)
+			os.Exit(1)
+		}
+
+		// fmt.Println("Please specify a request to run using the '-r' flag")
+		// fmt.Println("Check the '-h' flag for additional help.")
+		os.Exit(0)
 	}
 
 	// If the -a option is enabled, run all tests, else run the specified test

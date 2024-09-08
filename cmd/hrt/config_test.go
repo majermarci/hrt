@@ -83,19 +83,24 @@ func TestListAllRequests(t *testing.T) {
 	}
 	defer os.Remove(file.Name())
 
-	// Write an example config in the temp file
 	_, err = file.WriteString("test1:\n  url: http://localhost:8080\ntest2:\n  url: http://localhost:8080")
 	if err != nil {
 		t.Fatalf("Failed to write to temporary file: %v", err)
 	}
 
-	// Get the output of the listing...
-	output := captureOutput(func() {
-		err = listAllRequests(file.Name())
-		if err != nil {
-			t.Errorf("error listing requests %v", err)
-		}
-	})
+	err = file.Close()
+	if err != nil {
+		t.Fatalf("Failed to close temporary file: %v", err)
+	}
 
-	equalsTo(t, output, "test1\ntest2\n")
+	requests, err := listAllRequests(file.Name())
+	if err != nil {
+		t.Errorf("Error listing requests: %v", err)
+	}
+
+	expected := []string{"test1", "test2"}
+
+	if !equalsSlice(requests, expected) {
+		t.Errorf("Expected %v, but got %v", expected, requests)
+	}
 }
